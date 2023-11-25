@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
-const port = 2223;
+const port = 2023;
 
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const publicRoutes = require("./routes/publicRoutes/index");
