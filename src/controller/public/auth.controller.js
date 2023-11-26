@@ -52,10 +52,10 @@ const registerController = async (req, res) => {
     const lastUser = await User.findOne().sort({ createdAt: -1 });
     let generatedUserId;
     let isUserIdUnique = false;
-    generatedUserId = generateUniqueIdByDate(lastUser);
+    // generatedUserId = generateUniqueIdByDate(lastUser);
 
     while (!isUserIdUnique) {
-      // generatedUserId = generateUniqueUserID();
+      generatedUserId = generateUniqueUserID();
       const isUserExists = await User.findOne({ userId: generatedUserId });
       if (!isUserExists) {
         isUserIdUnique = true;
@@ -368,9 +368,9 @@ const createOtpController = async (req, res) => {
 // Get Sponsor Name
 const getSponsorNameController = async (req, res) => {
   const userId = req.params.userId;
-
+  console.log({ userId });
   const user = await User.findOne({ userId: userId });
-
+  console.log(user);
   if (user) {
     return res.status(200).json({
       name: user.fullName,

@@ -14,8 +14,8 @@ const sendEmailNotification = (
     port: 587,
     secure: false,
     auth: {
-      user: "ABHIFX024@gmail.com",
-      pass: "rxrctyzinknxitwc",
+      user: "growmoretodaypro@gmail.com",
+      pass: "hulaxgfjuxykytff",
     },
   });
 
@@ -25,15 +25,15 @@ const sendEmailNotification = (
         <p>We have an important update regarding your ${type} request for <strong>$${amount}</strong> amount:</p>
         <p>${message}</p>
         <p>
-          For further details or assistance, please contact our customer support team at ABHIFX024@gmail.com. <br/>
-          Thank you for choosing abhifx024.
+          For further details or assistance, please contact our customer support team at growmoretodaypro@gmail.com. <br/>
+          Thank you for choosing Grow More.
         </p>
         Best regards, <br/>
-        abhifx024
+        Grow More
     </div>`;
 
   let mailOption = {
-    from: "abhifx024",
+    from: "Grow More",
     to: email,
     subject: subject,
     html: messageBody,

@@ -6,13 +6,13 @@ const sendConfirmRegistrationMail = (user, userId) => {
     port: 587,
     secure: false,
     auth: {
-      user: "ABHIFX024@gmail.com",
-      pass: "rxrctyzinknxitwc",
-    },
+        user: "growmoretodaypro@gmail.com",
+        pass: "hulaxgfjuxykytff",
+      },
   });
 
   let mailOption = {
-    from: "abhifx024",
+    from: "grow more",
     to: user.email,
     subject: "Successfully Registered",
     text: `Hello! ${user.fullName}
@@ -24,11 +24,9 @@ const sendConfirmRegistrationMail = (user, userId) => {
             Email: ${user.email}`,
     html: `<div style="width: 640px; height: fit-content; margin-left: 50px; position: relative;">
    
-        <div style="width: 100% ; height: 100; ">
-            <img  style="width: 100%; height: 200px;" src="https://res.cloudinary.com/deavhufn6/image/upload/v1699159850/bb_bdtg5j.png" />
-        </div>
+       
         <div>
-        <h1 style="text-align: center;">Welcome to <a href="https://abhifx024.com">abhifx024</a></h1>
+        <h1 style="text-align: center;">Welcome to <a href="https://growmoretoday.netlify.app">Grow More</a></h1>
         <div  style="padding: 0 60px; width: 100%;">
            
     </div>
@@ -96,18 +94,20 @@ const sendConfirmRegistrationMail = (user, userId) => {
     
     </div>
     <div style="height: 50px; width: 300px; background-color: green; margin: 30px; border-radius: 5px;">
-        <a href="https://abhifx024.com/login" style="display: block; height: 100%; width: 100%; color: white; text-decoration: none; font-size: 20px; text-align: center; line-height: 50px;">Login Now</a>
+        <a href="https://growmoretoday.netlify.app/login" style="display: block; height: 100%; width: 100%; color: white; text-decoration: none; font-size: 20px; text-align: center; line-height: 50px;">Login Now</a>
     </div>
            
    </div>
    <hr/>
    <div>
-    <h3 style="color: black;">Thanks for Choosing ABHIFX024</h3>
-    <h3 style="color: black;">- The ABHIFX024 Team </h3>
+    <h3 style="color: black;">Thanks for Choosing Grow More</h3>
+    <h3 style="color: black;">- The Grow More Team </h3>
    </div>
 </div>`,
   };
-
+ // <div style="width: 100% ; height: 100; ">
+        //     <img  style="width: 100%; height: 200px;" src="https://res.cloudinary.com/deavhufn6/image/upload/v1699159850/bb_bdtg5j.png" />
+        // </div>
   transporter.sendMail(mailOption, async (error, info) => {
     if (error) {
       console.log(error);

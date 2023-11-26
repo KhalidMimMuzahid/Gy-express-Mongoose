@@ -1,25 +1,23 @@
 const nodemailer = require("nodemailer");
 
 const sendForgotPasswordMail = (email, token) => {
-  const reset_password_url = `https://abhifx024.com/resetpassword/${token}`;
+  const reset_password_url = `https://growmoretoday.netlify.app/resetpassword/${token}`;
   let transporter = nodemailer.createTransport({
     service: "Gmail",
     port: 587,
     secure: false,
     auth: {
-      user: "ABHIFX024@gmail.com",
-      pass: "rxrctyzinknxitwc",
+      user: "growmoretodaypro@gmail.com",
+      pass: "hulaxgfjuxykytff",
     },
   });
 
   let mailOption = {
-    from: "abhifx024",
+    from: "grow more",
     to: email,
     subject: "Forgot Password",
     html: `<div style="width: 640px; height: fit-content; margin-left: 50px; position: relative;">
-      <div style="width: 100% ; height: 100; ">
-          <img  style="width: 100%; height: 200px;" src="https://res.cloudinary.com/deavhufn6/image/upload/v1699159850/bb_bdtg5j.png" />
-      </div>
+      
     <div style="width: 100%">
       <p style="width: 100%; text-align: center">
         Please click the button below to reset your password.
@@ -39,7 +37,7 @@ const sendForgotPasswordMail = (email, token) => {
       </p>
     </div>
     <p>Regards,</p>
-    <a>abhifx024</a>
+    <a>grow more</a>
   </div>`,
   };
 
