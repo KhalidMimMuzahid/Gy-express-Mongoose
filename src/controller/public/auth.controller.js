@@ -295,7 +295,7 @@ const createOtpController = async (req, res) => {
     }
     // for change password
     if (user_id && current_password) {
-      // console.log("userid", user_id)
+      console.log("userid", user_id)
       const user = await User.findOne({ userId: user_id });
       if (user && (await user.matchPassword(current_password))) {
         const existingOtp = Otp.findOne({ email: user.email });
@@ -327,8 +327,9 @@ const createOtpController = async (req, res) => {
     }
     // for change email
     if (user_id && new_email) {
-      const user = await User.findOne({ userId: user_id });
-      const existEmail = await User.findOne({ email: user.email });
+     console.log({user_id})
+      const user = await User.findOne({ userId: user_id.toUpperCase() });
+      const existEmail = await User.findOne({ email: user?.email });
       if (existEmail) {
         const existingOtp = Otp.findOne({ email: existEmail.email });
         if (existingOtp) {
