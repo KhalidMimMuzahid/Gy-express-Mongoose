@@ -37,7 +37,7 @@ app.use("/api/v1/secure", secureRoutes);
 // app.get("/api/v1/test", rankIncome)
 
 app.get("/", (req, res) => {
-  return res.send("ABHIFX024 Production !");
+  return res.send("Grow More Today Production !");
 });
 
 app.use(notFound);

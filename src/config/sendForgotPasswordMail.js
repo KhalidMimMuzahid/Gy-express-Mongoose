@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 
 const sendForgotPasswordMail = (email, token) => {
-  const reset_password_url = `https://growmoretoday.netlify.app/resetpassword/${token}`;
+  const reset_password_url = `http://growmore.today/resetpassword/${token}`;
   let transporter = nodemailer.createTransport({
     service: "Gmail",
     port: 587,

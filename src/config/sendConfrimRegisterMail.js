@@ -6,9 +6,9 @@ const sendConfirmRegistrationMail = (user, userId) => {
     port: 587,
     secure: false,
     auth: {
-        user: "growmoretodaypro@gmail.com",
-        pass: "hulaxgfjuxykytff",
-      },
+      user: "growmoretodaypro@gmail.com",
+      pass: "hulaxgfjuxykytff",
+    },
   });
 
   let mailOption = {
@@ -26,7 +26,7 @@ const sendConfirmRegistrationMail = (user, userId) => {
    
        
         <div>
-        <h1 style="text-align: center;">Welcome to <a href="https://growmoretoday.netlify.app">Grow More</a></h1>
+        <h1 style="text-align: center;">Welcome to <a href="http://growmore.today">Grow More</a></h1>
         <div  style="padding: 0 60px; width: 100%;">
            
     </div>
@@ -94,7 +94,7 @@ const sendConfirmRegistrationMail = (user, userId) => {
     
     </div>
     <div style="height: 50px; width: 300px; background-color: green; margin: 30px; border-radius: 5px;">
-        <a href="https://growmoretoday.netlify.app/login" style="display: block; height: 100%; width: 100%; color: white; text-decoration: none; font-size: 20px; text-align: center; line-height: 50px;">Login Now</a>
+        <a href="http://growmore.today/login" style="display: block; height: 100%; width: 100%; color: white; text-decoration: none; font-size: 20px; text-align: center; line-height: 50px;">Login Now</a>
     </div>
            
    </div>
@@ -105,9 +105,9 @@ const sendConfirmRegistrationMail = (user, userId) => {
    </div>
 </div>`,
   };
- // <div style="width: 100% ; height: 100; ">
-        //     <img  style="width: 100%; height: 200px;" src="https://res.cloudinary.com/deavhufn6/image/upload/v1699159850/bb_bdtg5j.png" />
-        // </div>
+  // <div style="width: 100% ; height: 100; ">
+  //     <img  style="width: 100%; height: 200px;" src="https://res.cloudinary.com/deavhufn6/image/upload/v1699159850/bb_bdtg5j.png" />
+  // </div>
   transporter.sendMail(mailOption, async (error, info) => {
     if (error) {
       console.log(error);

@@ -21,7 +21,7 @@ const sendVerificationMail = async (user) => {
         </p>
         <p style="width: 100%; text-align: center; margin-top: 30px">
           <a
-            href="https://growmoretoday.netlify.app/login/${user?.token}"
+            href="http://growmore.today/login/${user?.token}"
             style="
               padding: 12px 8px;
               background-color: #348edb;
@@ -34,7 +34,7 @@ const sendVerificationMail = async (user) => {
         </p>
       </div>
       <p>Regards,</p>
-      <a target="_blank" href="https://growmoretoday.netlify.app">Grow More</a>
+      <a target="_blank" href="http://growmore.today">Grow More</a>
     </div>`,
   };
 
