@@ -14,7 +14,7 @@ const { notFound, errorHandler } = require("./src/middleware/errorMiddleware");
 const runPackageROI = require("./src/utils/runPackageROI");
 
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://abhifx024.com"],
+  origin: ["http://localhost:3000", "https://growmore.today"],
   optionsSuccessStatus: 200,
 };
 // Middleware
