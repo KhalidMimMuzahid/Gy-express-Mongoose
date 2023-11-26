@@ -6,14 +6,15 @@ const generateToken = (id) => {
   });
 };
 
-const verify_jwt =(token)=> {
-    try {
-      // tokenTrim = token.split(" ")[1];
-        let decoded = jwt.verify(token, process.env.SEC_KEY);
-        return { status: true, data: decoded };
-    } catch (e) {
-        return { status: false, message: e.message };
-    }
-}
+const verify_jwt = (token) => {
+  try {
+    // tokenTrim = token.split(" ")[1];
+    let decoded = jwt.verify(token, process.env.SEC_KEY);
+    if(decoded)
+    return { status: true, data: decoded };
+  } catch (e) {
+    return { status: false, message: e.message };
+  }
+};
 
 module.exports = { generateToken, verify_jwt };

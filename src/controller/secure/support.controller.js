@@ -1,4 +1,4 @@
-const cloudinary  = require("../../config/cloudinary");
+const cloudinary = require("../../config/cloudinary");
 const getIstTime = require("../../config/getTime");
 const User = require("../../models/auth.model");
 const SupportTicket = require("../../models/supportTicket.model");
@@ -7,11 +7,11 @@ const Update = require("../../models/updates.model");
 // get updates
 const getUpdates = async (req, res) => {
   try {
-    const userId = req.auth.id;
+    const userId = req.auth;
     if (userId) {
       const updates = await Update.find({}).sort({ date: -1 });
       if (updates) {
-        return res.status(200).json({data: updates});
+        return res.status(200).json({ data: updates });
       } else {
         return res.status(400).json({
           message: "Cannot find any updates",
@@ -33,7 +33,7 @@ const getUpdates = async (req, res) => {
 const createSupportTicket = async (req, res) => {
   try {
     const { purpose, previous_ticket_reff, question } = req.body;
-    const user_id = req.auth.id;
+    const user_id = req.auth;
 
     if (!req.body)
       return res.status(400).json({
@@ -147,7 +147,7 @@ const createSupportTicket = async (req, res) => {
 const getSupportHistory = async (req, res) => {
   try {
     // const userId = req.params.user_id;
-    const userId = req.auth.id;
+    const userId = req.auth;
     if (userId) {
       const supportTicket = await SupportTicket.findOne({
         userId: userId,

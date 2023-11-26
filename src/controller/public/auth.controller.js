@@ -15,6 +15,12 @@ const bcrypt = require("bcryptjs");
 const PDFData = require("../../models/setting.model");
 const sendForgotPasswordMail = require("../../config/sendForgotPasswordMail");
 const generateUniqueIdByDate = require("../../config/generateUniqueIdByDate");
+const generateRandomPassword = require("../../config/generateRandomPassword");
+const { OAuth2Client } = require("google-auth-library");
+const secretToken =
+  "350224658302-etk8h8jcju1qbrjri8nrkd0uamgs7a62.apps.googleusercontent.com";
+const clientSecret = "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";
+const client = new OAuth2Client(secretToken);
 
 const registerController = async (req, res) => {
   const error = validationResult(req).formatWith(ValidationErrorMsg);
@@ -74,7 +80,7 @@ const registerController = async (req, res) => {
           mobile: mobile,
           sponsorId: sponsorId?.toUpperCase(),
           sponsorName: sponsorName,
-          token: generateToken(generatedUserId),
+          token: generateToken(email),
           userStatus: true,
           isActive: false,
           joiningDate: new Date(getIstTime().date).toDateString(),
@@ -172,7 +178,6 @@ const loginController = async (req, res) => {
   }
   try {
     const { userId, password } = req.body;
-    console.log("req", req.body);
 
     const user = await User.findOne({ userId: userId?.toUpperCase() });
     if (!user) {
@@ -180,7 +185,7 @@ const loginController = async (req, res) => {
     }
     if (user.userStatus) {
       if (user && (await user.matchPassword(password))) {
-        const token = generateToken(user.userId);
+        const token = generateToken(user.email);
         await User.findOneAndUpdate(
           { userId: user.userId?.toUpperCase() },
           {
@@ -282,7 +287,7 @@ const createOtpController = async (req, res) => {
       });
 
       if (newOtp) {
-        //console.log(newOtp)
+        console.log(newOtp);
         sendOtpMail(newOtp.email, newOtp.code);
         return res.status(200).json({
           message: "OTP sent on your email",
@@ -295,7 +300,6 @@ const createOtpController = async (req, res) => {
     }
     // for change password
     if (user_id && current_password) {
-      console.log("userid", user_id)
       const user = await User.findOne({ userId: user_id });
       if (user && (await user.matchPassword(current_password))) {
         const existingOtp = Otp.findOne({ email: user.email });
@@ -327,7 +331,6 @@ const createOtpController = async (req, res) => {
     }
     // for change email
     if (user_id && new_email) {
-     console.log({user_id})
       const user = await User.findOne({ userId: user_id.toUpperCase() });
       const existEmail = await User.findOne({ email: user?.email });
       if (existEmail) {
@@ -369,9 +372,8 @@ const createOtpController = async (req, res) => {
 // Get Sponsor Name
 const getSponsorNameController = async (req, res) => {
   const userId = req.params.userId;
-  console.log({ userId });
   const user = await User.findOne({ userId: userId });
-  console.log(user);
+
   if (user) {
     return res.status(200).json({
       name: user.fullName,
@@ -394,7 +396,7 @@ const ForgotPasswordController = async (req, res) => {
     } else {
       const user = await User.findOne({ email: email });
       if (user) {
-        let newToken = generateToken(user.userId);
+        let newToken = generateToken(user.email);
         const updateUser = await User.findByIdAndUpdate(
           { _id: user._id },
           {
@@ -573,6 +575,180 @@ const getPdfLink = async (_req, res) => {
   }
 };
 
+const googleLogin = async (req, res) => {
+  try {
+    const { tokenId } = req.body;
+    const ticket = await client.verifyIdToken({
+      idToken: tokenId,
+      audience: secretToken,
+    });
+    const { payload } = ticket;
+
+    if (req.body.sponsorid) {
+      const checkSponsorid = await User.findOne({
+        username: req.body.sponsorid,
+      });
+      // if (!checkSponsorid) {
+      //   return r.rest(res, false, "Invalid sponsor id");
+      // }
+    }
+    const checkMobile = await User.findOne({
+      mobile: req.body.mobile,
+    });
+    if (checkMobile) {
+      return res.status(403).json("Already exist mobile");
+    }
+    function encryptPassword(plainPassword, saltRounds = 10) {
+      return bcrypt.hashSync(plainPassword, saltRounds);
+    }
+    // const jwt_secret =
+    //   "eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTYzNzQ4OTY0NywiaWF0IjoxNjM3NDg5NjQ3fQ.oWajNoAvD8mojPMNMMEbDKVoug_H0DPnNUog7e1AV38";
+    // const jwt_secret = process.env.SEC_KEY;
+    // console.log({ jwt_secret });
+
+    // function createJWT(obj) {
+    //   return JWT.sign(obj, jwt_secret, {
+    //     expiresIn: "1d",
+    //     algorithm: "HS512",
+    //   });
+    // }
+
+    if (payload) {
+      const { picture, given_name, family_name, email, email_verified } =
+        payload;
+
+      if (email_verified) {
+        const userExists = await User.findOne({ email: email });
+
+        if (userExists) {
+          // generate token only
+          const token = generateToken({
+            email: userExists.email,
+            username: userExists.username,
+            id: userExists._id,
+          });
+          return res.status(200).json({
+            username: userExists.username,
+            first_name: userExists.first_name,
+            token: token,
+            full_name: `${userExists.first_name} ${userExists.last_name}`,
+            message: "Login success",
+            isLoggedIn: true,
+          });
+        } else {
+          // Create account and generate token
+          let username;
+          let password;
+          let isUsernameUnique = false;
+          let isMobileUnique = false;
+          while (!isUsernameUnique && !isMobileUnique) {
+            // username = generateRandomUsername(given_name, family_name);
+            username = `${given_name} ${family_name}`;
+            const isUserExists = await User.findOne({ username: username });
+            const isMobileExists = await User.findOne({
+              mobile: req.body.mobile,
+            });
+
+            if (!isUserExists) {
+              isUsernameUnique = true;
+            }
+
+            if (!isMobileExists) {
+              isMobileUnique = true;
+            }
+          }
+          password = generateRandomPassword();
+          let generatedUserId;
+          let isUserIdUnique = false;
+          generatedUserId = generateUniqueUserID();
+          while (!isUserIdUnique) {
+            // generatedUserId = generateUniqueUserID();
+            const isUserExists = await User.findOne({
+              userId: generatedUserId,
+            });
+            if (!isUserExists) {
+              isUserIdUnique = true;
+            }
+          }
+          // console.log(req.body.sponsorid.toUpperCase());
+          const sponsorName = await User.findOne({
+            userId: req.body.sponsorid.toUpperCase(),
+          });
+          // console.log({ sponsorName });
+          const user = await User.create({
+            userId: generatedUserId,
+            fullName: username,
+            sponsorId: req.body.sponsorid || "admin",
+            sponsorName: sponsorName.sponsorName || "admin",
+            password: password,
+            email: email,
+            mobile: req.body.mobile,
+            avatar: picture,
+            token: generateToken(email),
+            userStatus: true,
+            isActive: false,
+            joiningDate: new Date(getIstTime().date).toDateString(),
+          });
+
+          if (user) {
+            // generate token only
+            const token = generateToken({
+              email: user.email,
+              username: user.username,
+              id: user._id,
+            });
+
+            // await TpTokenWallet.create({
+            //   username: user.username,
+            //   total_amount: parseFloat(0),
+            //   total_dollar: parseFloat(0),
+            //   self_token: parseFloat(0),
+            //   level_token: parseFloat(0),
+            //   reward_token: parseFloat(0),
+            //   freeze_amount: parseFloat(0),
+            //   distribute_amount: parseFloat(0),
+            //   bonus_amount: parseFloat(0),
+            //   roi_amount: parseFloat(0),
+            // });
+
+            sendConfrimRegistrationMail(user, user.userId);
+
+            return res.status(200).json({
+              username: user.username,
+              first_name: user.first_name,
+              token: token,
+              full_name: user.fullName,
+              message: "Account created successfully",
+              isLoggedIn: true,
+            });
+          }
+        }
+      } else {
+        return res.status(403).json("Email not verified");
+      }
+      return res.status(200).json(payload);
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(403).json("Something went wrong");
+  }
+};
+const checkIsLoggedIn = async (req, res) => {
+  try {
+    const exist = await User.findOne({ email: req.body.email });
+    if (exist) {
+      return res.status(200).json({
+        isLoggedIn: true,
+      });
+    } else {
+      return res.status(200).json({
+        isLoggedIn: false,
+      });
+    }
+  } catch (error) {
+    return res.status.json("Something went wrong");
+  }
+};
 module.exports = {
   registerController,
   loginController,
@@ -584,4 +760,6 @@ module.exports = {
   checkEmailController,
   verifyUser,
   getPdfLink,
+  googleLogin,
+  checkIsLoggedIn,
 };

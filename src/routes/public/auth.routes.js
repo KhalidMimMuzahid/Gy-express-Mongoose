@@ -8,7 +8,9 @@ const {
   checkMobileNumberController,
   checkEmailController,
   verifyUser,
-  getPdfLink
+  getPdfLink,
+  googleLogin,
+  checkIsLoggedIn
 } = require("../../controller/public/auth.controller");
 const {
   registerValidator,
@@ -27,5 +29,8 @@ router.post("/reset_password/:token", resetPasswordController);
 router.get("/check_mobile/:mobile", checkMobileNumberController);
 router.get("/check_email/:email", checkEmailController);
 router.get("/get_pdf_link", getPdfLink);
+router.post("/google_login", googleLogin);
+router.post("/check_login", checkIsLoggedIn);
+
 
 module.exports = router;

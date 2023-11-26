@@ -13,13 +13,13 @@ const createTopupController = async (req, res) => {
       return res.status(400).json({ message: "Minimum amount is 500 INR" });
     }
 
-    if (!req.auth.id) {
+    if (!req.auth) {
       return res.status(400).json({ message: "User Id is required" });
     }
 
     // Extracting the balance of user
     const { depositBalance = 0, activeIncome = 0 } = await Wallet.findOne({
-      userId: req.auth.id,
+      userId: req.auth,
     });
     if (depositBalance + activeIncome < packageAmount) {
       return res.status(409).json({ message: "Insufficient balance!" });
@@ -30,14 +30,14 @@ const createTopupController = async (req, res) => {
     startDate.setDate(startDate.getDate() + 1);
     // Find existing package info
     const extPackageBuyInfo = await PackageBuyInfo.findOne({
-      userId: req.auth.id,
+      userId: req.auth,
     }).sort({ createdAt: -1 });
     // Find user
-    const currentUser = await User.findOne({ userId: req.auth.id });
+    const currentUser = await User.findOne({ userId: req.auth });
     // Deduct amount to wallet
     depositBalance >= packageAmount
       ? await Wallet.findOneAndUpdate(
-          { userId: req.auth.id },
+          { userId: req.auth },
           {
             $inc: {
               depositBalance: -packageAmount,
@@ -46,7 +46,7 @@ const createTopupController = async (req, res) => {
           }
         )
       : await Wallet.findOneAndUpdate(
-          { userId: req.auth.id },
+          { userId: req.auth },
           {
             $set: {
               depositBalance: 0,
@@ -89,7 +89,7 @@ const createTopupController = async (req, res) => {
       });
       // Get Current user
       await User.findOneAndUpdate(
-        { userId: req.auth.id },
+        { userId: req.auth },
         {
           $set: {
             isActive: true,
@@ -104,7 +104,7 @@ const createTopupController = async (req, res) => {
       );
     } else {
       await PackageRoi.findOneAndUpdate(
-        { userId: req.auth.id },
+        { userId: req.auth },
         {
           $set: {
             isActive: true,
@@ -159,7 +159,7 @@ const createTopupController = async (req, res) => {
 // Get topup history
 const getTopupHistoryController = async (req, res) => {
   try {
-    const history = await PackageBuyInfo.find({ userId: req.auth.id }).sort({
+    const history = await PackageBuyInfo.find({ userId: req.auth }).sort({
       createdAt: -1,
     });
     if (history.length > 0) {

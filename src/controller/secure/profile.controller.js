@@ -1,5 +1,5 @@
 const { cloudinary } = require("../../config/cloudinary");
-const Kyc  = require("../../models/KYCSchema");
+const Kyc = require("../../models/KYCSchema");
 const Bank = require("../../models/addBank.model");
 const User = require("../../models/auth.model");
 const Otp = require("../../models/otp.model");
@@ -9,7 +9,7 @@ const bcrypt = require("bcryptjs");
 // Get user Information
 const getUserInfo = async (req, res) => {
   try {
-    let userId = req.auth.id;
+    let userId = req.auth;
     const user = await User.findOne({ userId: userId }).select(["-password"]);
     if (user) {
       return res.status(200).json({
@@ -52,7 +52,7 @@ const updateUserInfo = async (req, res) => {
 const changePassword = async (req, res) => {
   try {
     const { current_password, new_password, otpCode } = req.body;
-    const user_id = req.auth.id;
+    const user_id = req.auth;
     if (!new_password) {
       return res.status(400).json({
         message: "New password is missing",
@@ -115,7 +115,7 @@ const updateEmail = async (req, res) => {
       });
     } else {
       const { currentEmail, new_email, otpCode } = req.body;
-      const user = await User.findOne({ userId: req.auth.id });
+      const user = await User.findOne({ userId: req.auth });
       // check already have anaccount with this email or not
       const existingUser = await User.findOne({ email: new_email });
       // check OTP
@@ -123,7 +123,7 @@ const updateEmail = async (req, res) => {
       if (otp?.code === otpCode) {
         if (!existingUser && user && user.email === currentEmail) {
           let updateEmail = await User.findOneAndUpdate(
-            { userId: req.auth.id },
+            { userId: req.auth },
             {
               $set: {
                 email: new_email,
@@ -161,10 +161,10 @@ const updateTrxAddress = async (req, res) => {
     if (!trx_address) {
       return res.status(400).json({ message: "TRX address is missing" });
     }
-    const extUser = await User.findOne({ userId: req.auth.id });
+    const extUser = await User.findOne({ userId: req.auth });
     // find User
     const user = await User.findOneAndUpdate(
-      { userId: req.auth.id },
+      { userId: req.auth },
       {
         $set: {
           walletAddress: trx_address,
@@ -173,7 +173,7 @@ const updateTrxAddress = async (req, res) => {
     );
     // find wallet
     const wallet = await Wallet.findOneAndUpdate(
-      { userId: req.auth.id },
+      { userId: req.auth },
       {
         $set: {
           walletAddress: trx_address,
@@ -197,7 +197,7 @@ const updateTrxAddress = async (req, res) => {
 // upload user profile picture
 const upLoadProofPic = async (req, res) => {
   try {
-    // const user_id = req.auth.id;
+    // const user_id = req.auth;
     const image = await cloudinary.uploader.upload(req.file.path);
     const avatar = {
       avatar: image.secure_url,
@@ -213,7 +213,7 @@ const upLoadProofPic = async (req, res) => {
 // update user profile picture
 const updateProfilePic = async (req, res) => {
   try {
-    const user_id = req.auth.id;
+    const user_id = req.auth;
     if (!req.file?.path)
       res.status(400).json({
         message: "Image is missing",
@@ -245,12 +245,21 @@ const updateProfilePic = async (req, res) => {
 };
 const addOrUpdateBank = async (req, res) => {
   try {
-    const user_id = req.auth.id;
-    const { bankName, holderName, branchName, accountNumber, IFSCCode } = req.body;
+    const user_id = req.auth;
+    const { bankName, holderName, branchName, accountNumber, IFSCCode } =
+      req.body;
 
     // Validate the data (you can add more validation as needed)
-    if (!bankName || !holderName || !branchName || !accountNumber || !IFSCCode) {
-      return res.status(400).json({ message: 'Please provide all required fields.' });
+    if (
+      !bankName ||
+      !holderName ||
+      !branchName ||
+      !accountNumber ||
+      !IFSCCode
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Please provide all required fields." });
     }
 
     // Check if a bank already exists for the user
@@ -266,7 +275,9 @@ const addOrUpdateBank = async (req, res) => {
 
       await existingBank.save();
 
-      res.status(200).json({ message: 'Bank updated successfully', bank: existingBank });
+      res
+        .status(200)
+        .json({ message: "Bank updated successfully", bank: existingBank });
     } else {
       // Create a new bank object
       const newBank = new Bank({
@@ -281,34 +292,41 @@ const addOrUpdateBank = async (req, res) => {
       // Save the bank to the database
       await newBank.save();
 
-      res.status(201).json({ message: 'New bank created successfully', bank: newBank });
+      res
+        .status(201)
+        .json({ message: "New bank created successfully", bank: newBank });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'An error occurred while updating/adding the bank.' });
+    res
+      .status(500)
+      .json({ message: "An error occurred while updating/adding the bank." });
   }
 };
 
-const getBank = async(req, res)=>{
+const getBank = async (req, res) => {
   try {
-  
     // Extract the user ID from the request parameters
-    const user_id = req.auth.id;
+    const user_id = req.auth;
 
     // Find banks that belong to the specified user
     const banks = await Bank.find({ userId: user_id });
 
     // Check if any banks are found
     if (!banks || banks.length === 0) {
-      return res.status(404).json({ message: 'No banks found for the user ID' });
+      return res
+        .status(404)
+        .json({ message: "No banks found for the user ID" });
     }
 
-    res.status(200).json({ message: 'Banks retrieved successfully', banks });
+    res.status(200).json({ message: "Banks retrieved successfully", banks });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'An error occurred while fetching banks by user ID.' });
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching banks by user ID." });
   }
-}
+};
 
 const createKycApi = async (req, res) => {
   const sendResponse = (res, success, message, data) => {
@@ -318,78 +336,82 @@ const createKycApi = async (req, res) => {
       data,
     });
   };
-  
+
   try {
     // Get the request body
     const kycData = req.body;
 
-console.log(req.auth.id)
+    console.log(req.auth);
     // Check if the user already has a KYC in "success" or "pending" status
     const existingKyc = await Kyc.findOne({
-      userId: req.auth.id,
+      userId: req.auth,
       status: { $in: ["success", "pending"] },
     });
 
     if (!existingKyc) {
       // Set the user ID and create the KYC document
-      kycData.userId = req.auth.id;
-      console.log({kycData})
+      kycData.userId = req.auth;
+      console.log({ kycData });
       const createdKyc = await Kyc.create(kycData);
 
       if (createdKyc) {
         // Return a success response
-        return sendResponse(res, true, 'KYC created successfully', createdKyc);
+        return sendResponse(res, true, "KYC created successfully", createdKyc);
       } else {
         // Handle the case where KYC creation failed
-        return sendResponse(res, false, 'KYC creation failed', null);
+        return sendResponse(res, false, "KYC creation failed", null);
       }
     } else {
       // Handle the case where the user already has a KYC
-      return sendResponse(res, false, 'User already has a KYC in progress or completed', null);
+      return sendResponse(
+        res,
+        false,
+        "User already has a KYC in progress or completed",
+        null
+      );
     }
   } catch (error) {
     // Handle unexpected errors
     console.error(error);
-    return sendResponse(res, false, 'Something went wrong', null);
+    return sendResponse(res, false, "Something went wrong", null);
   }
 };
 
-
 const getKycApi = async (req, res) => {
-  
-  
   try {
     // Find KYC documents for the user with the provided user ID
-    const userKyc = await Kyc.find({ userId: req.auth.id });
+    const userKyc = await Kyc.find({ userId: req.auth });
 
     if (userKyc && userKyc.length > 0) {
       // Return a success response with the KYC documents
-      res.status(200).json({message:"KYC Document Found", data:userKyc})
-
+      res.status(200).json({ message: "KYC Document Found", data: userKyc });
     } else {
       // Handle the case where no KYC documents are found
-      res.status(500).json({ message: 'SNo KYC documents found for the user' });
+      res.status(500).json({ message: "SNo KYC documents found for the user" });
     }
   } catch (error) {
     // Handle unexpected errors and provide an informative error message
     console.error(error);
-    res.status(500).json({ message: 'Something went wrong while fetching KYC documents' });
+    res
+      .status(500)
+      .json({ message: "Something went wrong while fetching KYC documents" });
   }
 };
 
-const getKycSuccess= async (req, res) => {
+const getKycSuccess = async (req, res) => {
   try {
-    const userKyc = await Kyc.find({ userId: req.auth.id ,status: "success"});
+    const userKyc = await Kyc.find({ userId: req.auth, status: "success" });
 
     if (userKyc && userKyc.length > 0) {
-      res.status(200).json({message:"KYC Document Found", data:userKyc})
-
+      res.status(200).json({ message: "KYC Document Found", data: userKyc });
     } else {
-      res.status(500).json({ message: 'SNo KYC documents found for the user' });
+      res.status(500).json({ message: "SNo KYC documents found for the user" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Something went wrong while fetching KYC documents' });
+    res
+      .status(500)
+      .json({ message: "Something went wrong while fetching KYC documents" });
   }
 };
 module.exports = {

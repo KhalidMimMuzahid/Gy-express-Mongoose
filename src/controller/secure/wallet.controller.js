@@ -154,7 +154,7 @@ const depositeAmount = async (req, res) => {
 const depositeHistory = async (req, res) => {
   try {
     // Get the user ID from the request's authenticated user (assuming this middleware exists).
-    const user_id = req.auth.id;
+    const user_id = req.auth;
 
     if (!user_id) {
       return res.status(400).json({ message: "User id is required" });
@@ -185,7 +185,7 @@ const depositeHistory = async (req, res) => {
 // Get My wallet
 const getMyWallet = async (req, res) => {
   try {
-    const wallet = await Wallet.findOne({ userId: req.auth.id }).lean();
+    const wallet = await Wallet.findOne({ userId: req.auth }).lean();
     if (wallet) {
       wallet.totalBalance = wallet.investmentAmount + wallet.activeIncome;
       return res.status(200).json({ data: wallet });

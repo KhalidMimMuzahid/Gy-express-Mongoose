@@ -11,7 +11,7 @@ const ValidationErrorMsg = require("../../helpers/ValidationErrorMsg");
 const withdrawAmount = async (req, res) => {
   try {
     const { amount, accountNumber, withdrawType } = req.body;
-    const userId = req.auth.id;
+    const userId = req.auth;
     const user = await User.findOne({ userId });
     const wallet = await Wallet.findOne({ userId });
 
@@ -139,7 +139,7 @@ const withdrawAmount = async (req, res) => {
 // get withdraw history
 const withdrawHistory = async (req, res) => {
   try {
-    const userId = req.auth.id;
+    const userId = req.auth;
     if (!userId) {
       return res.status(400).json({ message: "User Id is required" });
     }

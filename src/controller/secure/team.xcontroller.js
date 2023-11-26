@@ -5,7 +5,7 @@ const { PackageBuyInfo } = require("../../models/topup.model");
 // get level team
 const getLevelTeam = async (req, res) => {
   try {
-    const user_id = req.auth.id;
+    const user_id = req.auth;
 
     if (!user_id) {
       return res.status(400).json({
@@ -63,7 +63,7 @@ const getLevelTeam = async (req, res) => {
 // Get Direct Level Team
 const getDirectLevelTeam = async (req, res) => {
   try {
-    const user_id = req.auth.id;
+    const user_id = req.auth;
 
     if (!user_id) {
       return res.status(400).json({
@@ -122,7 +122,7 @@ const getDirectLevelTeam = async (req, res) => {
 const getLevelBusiness = async (req, res) => {
   try {
     const levelInfo = [];
-    const findLevel = await Level.findOne({ userId: req.auth.id });
+    const findLevel = await Level.findOne({ userId: req.auth });
     for (let i = 1; i <= 7; i++) {
       const levels = findLevel?.level?.filter((d) => d.level === `${i}`) || [];
       const totalTeam = +levels?.length; // total Team

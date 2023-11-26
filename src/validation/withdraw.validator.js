@@ -8,7 +8,7 @@ const withdrawAmountValidators = [
     .notEmpty()
     .withMessage("Amount is required")
     .custom(async (amount, { req }) => {
-      const wallet = await Wallet.findOne({ userId: req.auth.id });
+      const wallet = await Wallet.findOne({ userId: req.auth });
       if (req.body.withdrawType === "profit" && Number(amount) < 10) {
         return Promise.reject("Minimum withdraw amount is $10");
       }
@@ -29,7 +29,7 @@ const withdrawAmountValidators = [
     .notEmpty()
     .withMessage("Wallet address is required")
     .custom(async (trx_address, { req }) => {
-      const user = await User.findOne({ userId: req.auth.id });
+      const user = await User.findOne({ userId: req.auth });
       if (user.walletAddress !== trx_address) {
         return Promise.reject("Wallet address is invalid");
       }

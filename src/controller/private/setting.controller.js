@@ -7,7 +7,7 @@ const { Result } = require("express-validator");
 const changePassword = async (req, res) => {
   try {
     const { current_password, new_password, otpCode } = req.body;
-    const user_id = req.auth.id;
+    const user_id = req.auth;
     if (!new_password) {
       return res.status(400).json({
         message: "New password is missing",
@@ -68,7 +68,7 @@ const updateEmail = async (req, res) => {
       });
     } else {
       const { currentEmail, new_email, otpCode } = req.body;
-      const user = await User.findOne({ userId: req.auth.id });
+      const user = await User.findOne({ userId: req.auth });
       // check already have anaccount with this email or not
       const existingUser = await User.findOne({ email: new_email });
       // check OTP
@@ -76,7 +76,7 @@ const updateEmail = async (req, res) => {
       if (otp?.code === otpCode) {
         if (!existingUser && user && user.email === currentEmail) {
           let updateEmail = await User.findOneAndUpdate(
-            { userId: req.auth.id },
+            { userId: req.auth },
             {
               $set: {
                 email: new_email,

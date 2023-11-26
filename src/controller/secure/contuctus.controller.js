@@ -22,27 +22,27 @@ const createContactUs = async (req, res) => {
   }
   try {
     const { message, name, user_id, email } = req.body;
-    const userId = req.auth.id;
+    const userId = req.auth;
     const subject = "about tron";
 
     if (!req.body)
-    return res.status(400).json({
+      return res.status(400).json({
         message: "Please provide data",
       });
     if (!message)
-    return res.status(400).json({
+      return res.status(400).json({
         message: "Message is missing",
       });
     if (!name)
-    return res.status(400).json({
+      return res.status(400).json({
         message: "Name is missing",
       });
     if (!user_id)
-    return res.status(400).json({
+      return res.status(400).json({
         message: "User ID is missing",
       });
     if (!email)
-    return res.status(400).json({
+      return res.status(400).json({
         message: "Email is missing",
       });
 
@@ -69,11 +69,11 @@ const createContactUs = async (req, res) => {
           ],
         });
         if (newContact) {
-        return res.status(200).json({
+          return res.status(200).json({
             message: "Contact us message created successfully",
           });
         } else {
-        return res.status(400).json({
+          return res.status(400).json({
             message: "Cannot create contact us message",
           });
         }
@@ -96,22 +96,22 @@ const createContactUs = async (req, res) => {
           }
         );
         if (updateContact) {
-        return res.status(200).json({
+          return res.status(200).json({
             message: "Contact us message created successfully",
           });
         } else {
-        return res.status(400).json({
+          return res.status(400).json({
             message: "Cannot create contact us message",
           });
         }
       }
     } else {
-    return res.status(400).json({
+      return res.status(400).json({
         message: "Invalid user credentials",
       });
     }
   } catch (error) {
-  return res.status(400).json({
+    return res.status(400).json({
       message: error.toString(),
     });
   }
@@ -121,26 +121,26 @@ const createContactUs = async (req, res) => {
 const getContactUsHistory = async (req, res) => {
   try {
     // const userId = req.params.user_id;
-    const userId = req.auth.id;
+    const userId = req.auth;
     if (userId) {
       const contactUs = await Contact.findOne({ userId: userId }).sort({
         "history.date": -1,
         "history.time": -1,
       });
       if (contactUs) {
-      return res.status(200).json(contactUs);
+        return res.status(200).json(contactUs);
       } else {
-      return res.status(400).json({
+        return res.status(400).json({
           message: "Cannot find Contact us history",
         });
       }
     } else {
-    return res.status(400).json({
+      return res.status(400).json({
         message: "Cannot find user credentials",
       });
     }
   } catch (error) {
-  return res.status(400).json({
+    return res.status(400).json({
       message: error.toString(),
     });
   }
