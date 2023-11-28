@@ -10,7 +10,9 @@ const {
   verifyUser,
   getPdfLink,
   googleLogin,
-  checkIsLoggedIn
+  checkIsLoggedIn,
+  checkUserEmail,
+  checkValidOTP
 } = require("../../controller/public/auth.controller");
 const {
   registerValidator,
@@ -31,6 +33,8 @@ router.get("/check_email/:email", checkEmailController);
 router.get("/get_pdf_link", getPdfLink);
 router.post("/google_login", googleLogin);
 router.post("/check_login", checkIsLoggedIn);
+router.get("/get_check_email/:userEmail", checkUserEmail);
+router.get("/get_check_otp/:otpCode", checkValidOTP);
 
 
 module.exports = router;

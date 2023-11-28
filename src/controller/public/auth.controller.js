@@ -45,20 +45,18 @@ const registerController = async (req, res) => {
       password,
       confirmPassword,
       mobile,
-      sponsorId,
+      sponsorid,
       sponsorName,
       otpCode,
       role,
     } = req.body;
-    if (!fullName || !email || !password || !role || !confirmPassword) {
+    if (!email || !password || !confirmPassword || !otpCode) {
       return res.status(400).json({ message: "Please Enter all the Feilds" });
     } else if (!password === confirmPassword) {
       return res.status(400).json({ message: "Password dosen't match" });
     }
-    const lastUser = await User.findOne().sort({ createdAt: -1 });
     let generatedUserId;
     let isUserIdUnique = false;
-    // generatedUserId = generateUniqueIdByDate(lastUser);
 
     while (!isUserIdUnique) {
       generatedUserId = generateUniqueUserID();
@@ -69,17 +67,20 @@ const registerController = async (req, res) => {
     }
     const userExists = await User.findOne({ email: email });
     const otp = await Otp.findOne({ email: email });
+    const sponsorname = await User.findOne({
+      userId: sponsorid?.toUpperCase(),
+    });
 
     if (!userExists) {
       if (otpCode && parseInt(otp?.code) === parseInt(otpCode)) {
         const user = await User.create({
-          fullName: fullName,
+          fullName: "",
           userId: generatedUserId,
           email: email,
           password: password,
-          mobile: mobile,
-          sponsorId: sponsorId?.toUpperCase(),
-          sponsorName: sponsorName,
+          mobile: "",
+          sponsorId: sponsorid || "ADMIN",
+          sponsorName: sponsorname?.fullName || "Admin",
           token: generateToken(email),
           userStatus: true,
           isActive: false,
@@ -177,9 +178,9 @@ const loginController = async (req, res) => {
     }
   }
   try {
-    const { userId, password } = req.body;
+    const { email, password } = req.body;
 
-    const user = await User.findOne({ userId: userId?.toUpperCase() });
+    const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(400).json({ message: "User is not found" });
     }
@@ -274,7 +275,7 @@ const createOtpController = async (req, res) => {
       }
     }
     // for register user
-    if (email && mobile) {
+    if (email) {
       const existingOtp = Otp.findOne({ email: email });
       if (existingOtp) {
         await Otp.deleteOne({ email: email });
@@ -592,12 +593,12 @@ const googleLogin = async (req, res) => {
       //   return r.rest(res, false, "Invalid sponsor id");
       // }
     }
-    const checkMobile = await User.findOne({
-      mobile: req.body.mobile,
-    });
-    if (checkMobile) {
-      return res.status(403).json("Already exist mobile");
-    }
+    // const checkMobile = await User.findOne({
+    //   mobile: req.body.mobile,
+    // });
+    // if (checkMobile) {
+    //   return res.status(403).json("Already exist mobile");
+    // }
     function encryptPassword(plainPassword, saltRounds = 10) {
       return bcrypt.hashSync(plainPassword, saltRounds);
     }
@@ -670,19 +671,20 @@ const googleLogin = async (req, res) => {
               isUserIdUnique = true;
             }
           }
-          // console.log(req.body.sponsorid.toUpperCase());
+          // console.log(req.body?.sponsorid?.toUpperCase());
           const sponsorName = await User.findOne({
-            userId: req.body.sponsorid.toUpperCase(),
+            userId: req.body?.sponsorid?.toUpperCase(),
           });
-          // console.log({ sponsorName });
+
+          console.log({ sponsorName });
           const user = await User.create({
             userId: generatedUserId,
             fullName: username,
-            sponsorId: req.body.sponsorid || "admin",
-            sponsorName: sponsorName.sponsorName || "admin",
+            sponsorId: req.body.sponsorid || "ADMIN",
+            sponsorName: sponsorName?.fullName || "Admin",
             password: password,
             email: email,
-            mobile: req.body.mobile,
+
             avatar: picture,
             token: generateToken(email),
             userStatus: true,
@@ -749,6 +751,49 @@ const checkIsLoggedIn = async (req, res) => {
     return res.status.json("Something went wrong");
   }
 };
+const checkUserEmail = async (req, res) => {
+  const email = req.params.userEmail;
+  try {
+    // Extract email from the request body
+    const user = await User.findOne({ email: email });
+
+    if (user) {
+      return res.status(200).json({
+        data: user,
+      });
+    } else {
+      return res.status(404).json({
+        message: "Invalid user Email",
+      });
+    }
+  } catch (error) {
+    return res.status(400).json({
+      message: error.toString(),
+    });
+  }
+};
+const checkValidOTP = async (req, res) => {
+  const otpCode = req.params.otpCode;
+  try {
+    const otp = await Otp.findOne({ code: otpCode });
+
+    if (otp?.code == otpCode) {
+      return res.status(200).json({
+        data: otp,
+      });
+    } else {
+      return res.status(404).json({
+        message: "Invalid OTP",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      message: error.toString(),
+    });
+  }
+};
+
 module.exports = {
   registerController,
   loginController,
@@ -762,4 +807,6 @@ module.exports = {
   getPdfLink,
   googleLogin,
   checkIsLoggedIn,
+  checkUserEmail,
+  checkValidOTP,
 };

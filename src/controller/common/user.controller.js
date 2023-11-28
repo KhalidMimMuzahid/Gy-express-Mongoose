@@ -27,6 +27,7 @@ const getUserInfo = async (req, res) => {
   }
 };
 
+
 // get popup image
 const getPopUpImg = async (req, res) => {
   try {

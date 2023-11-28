@@ -8,7 +8,6 @@ const userSchema = new mongoose.Schema(
     },
     fullName: {
       type: String,
-      required: [true, "Name is required"],
     },
     email: {
       type: String,
@@ -22,7 +21,6 @@ const userSchema = new mongoose.Schema(
     },
     mobile: {
       type: String,
-      required: [true, "Mobile is required"],
     },
     sponsorId: {
       type: String,

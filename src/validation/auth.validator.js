@@ -1,8 +1,8 @@
 const { body } = require("express-validator");
 const User = require("../models/auth.model");
+console.log(body.confirmPassword);
 
 const registerValidator = [
-  body("fullName").not().isEmpty().withMessage("Name is required").trim(),
   body("email")
     .not()
     .isEmpty()
@@ -17,46 +17,15 @@ const registerValidator = [
     .withMessage("Please provide a valid email"),
   body("password")
     .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long")
+    .withMessage("Password must be at least 6 characters longs")
     .matches(/\d/)
     .withMessage("Password must contain a number")
     .trim(),
   body("confirmPassword")
     .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long")
+    .withMessage("Password must be at least 6 characters long adb")
     .matches(/\d/)
     .withMessage("Password must contain a number")
-    .trim(),
-  body("mobile")
-    .not()
-    .isEmpty()
-    .withMessage("Mobile number is required")
-    // .isMobilePhone(['any'])
-    .withMessage("Mobile number is not valid")
-    .custom(async (mobile) => {
-      const mobileMatch = await User.findOne({ mobile });
-      if (mobileMatch) {
-        return Promise.reject("Mobile number already in use");
-      }
-    })
-    .trim(),
-  body("sponsorId")
-    .not()
-    .isEmpty()
-    .withMessage("Sponsor ID is required")
-    .trim(),
-  body("sponsorName")
-    .not()
-    .isEmpty()
-    .withMessage("Sponsor Name is required")
-    .trim(),
-  body("otpCode").not().isEmpty().withMessage("OTP Code is required").trim(),
-  body("role")
-    .not()
-    .isEmpty()
-    .withMessage("Role is required")
-    .isIn(["user", "admin"])
-    .withMessage("Role is out of role [user, admin]")
     .trim(),
 ];
 
@@ -94,7 +63,7 @@ const forgotPasswordValidationHandler = function (req, res, next) {
     next();
   } else {
     // Validation errors found, send an error response.
-  return res.status(400).json({
+    return res.status(400).json({
       errors: mappedErrors,
     });
   }
@@ -121,7 +90,7 @@ const resetPasswordValidationHandler = function (req, res, next) {
     next();
   } else {
     // Validation errors found, send an error response.
-  return res.status(400).json({
+    return res.status(400).json({
       errors: mappedErrors,
     });
   }
@@ -138,9 +107,7 @@ const ContactUsValidator = [
     .withMessage("Please provide a valid email"),
   body("message").notEmpty().withMessage("Message is required"),
   body("subject").notEmpty().withMessage("Subject is required"),
-  body("mobile")
-    .notEmpty()
-    .withMessage("Mobile is required")
+  body("mobile").notEmpty().withMessage("Mobile is required"),
 ];
 
 const contactusValidationHandler = function (req, res, next) {
@@ -149,7 +116,7 @@ const contactusValidationHandler = function (req, res, next) {
   if (Object.keys(mappedErrors).length === 0) {
     next();
   } else {
-  return res.send({
+    return res.send({
       errors: mappedErrors,
     });
   }
@@ -163,5 +130,5 @@ module.exports = {
   resetPasswordValidators,
   resetPasswordValidationHandler,
   ContactUsValidator,
-  contactusValidationHandler
+  contactusValidationHandler,
 };
