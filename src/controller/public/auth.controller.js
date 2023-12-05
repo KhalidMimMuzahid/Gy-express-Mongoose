@@ -178,9 +178,9 @@ const loginController = async (req, res) => {
     }
   }
   try {
-    const { email, password } = req.body;
+    const { email,userId, password } = req.body;
+    const user = await User.findOne({ $or: [{ email: email }, { userId: userId }] });
 
-    const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(400).json({ message: "User is not found" });
     }

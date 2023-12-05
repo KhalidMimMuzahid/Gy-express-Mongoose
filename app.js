@@ -12,6 +12,7 @@ const privateRoutes = require("./src/routes/private/index");
 
 const { notFound, errorHandler } = require("./src/middleware/errorMiddleware");
 const runPackageROI = require("./src/utils/runPackageROI");
+const runColorPrediction = require("./src/utils/runColorPrediction");
 
 const corsOptions = {
   origin: ["http://localhost:3000", "https://growmore.today"],
@@ -28,6 +29,8 @@ connectDB();
 
 // Run Function
 runPackageROI();
+//Run Color Prediction
+runColorPrediction()
 // Here will be custom routes
 
 app.use("/api/v1/public", publicRoutes);

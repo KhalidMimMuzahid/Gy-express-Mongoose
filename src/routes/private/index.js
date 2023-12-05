@@ -8,6 +8,7 @@ const showWithdeawRouter = require("./withdraw.routes");
 const earningRouter = require("./earning.routes");
 const settingRouter = require("./settings.routes");
 const topupRouter = require("./topup.routes");
+const colorRouter = require("./colorPrediction.routes");
 
 const middleware = [verifyJWT, verifyAdmin];
 router.use(middleware);
@@ -27,5 +28,7 @@ router.use(earningRouter);
 router.use(settingRouter);
 // Topup router
 router.use(topupRouter);
+// Color Prdiction router
+router.use(colorRouter);
 
 module.exports = router;

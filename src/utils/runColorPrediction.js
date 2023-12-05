@@ -1,0 +1,105 @@
+const getIstTime = require("../config/getTime");
+const cron = require("node-cron");
+
+const Wallet = require("../models/wallet.model");
+const selectWin = require("../models/selectWin");
+const backAmount = require("./backAmount");
+const ColorPrediction = require("../models/colourPrediction ");
+const ColorPredictionWinner = require("../models/colourPredictionWinner");
+const ColorPredictionHistory = require("../models/colourPredictionHistory");
+
+const runColorPrediction = () => {
+  cron.schedule(
+    "00 00 00 * * *", // This function will run Every Night 12 AM IST
+    // "*/20 * * * * *", // Every 20 sec
+    // "*/3 * * * * *", // every 3 min
+    async (res, req) => {
+      try {
+        const win = await selectWin.findOne({ id: "colorPredectionId" });
+        console.log({ win });
+        if (win?.color || win?.number) {
+          try {
+            const bets = await ColorPrediction.find({
+              $or: [{ color: win.color }, { number: win.number }],
+            });
+            // console.log(bets);
+            for (const bet of bets) {
+              let payout = 0;
+
+              if (bet.color === "green") {
+                if ([1, 3, 7, 9].includes(win.number)) {
+                  payout = bet.contractMoney * 2;
+                } else if (win.number === 5) {
+                  payout = bet.contractMoney * 1.5;
+                }
+              } else if (bet.color === "red") {
+                if ([2, 4, 6, 8].includes(win.number)) {
+                  payout = bet.contractMoney * 2;
+                } else if (win.number === 0) {
+                  payout = bet.contractMoney * 1.5;
+                }
+              } else if (bet.color === "Violet") {
+                if ([0, 5].includes(win.number)) {
+                  payout = bet.contractMoney * 4.5;
+                }
+              } else if (bet.color === "green-violet") {
+                if ([5].includes(win.number)) {
+                  payout = bet.contractMoney * 1.5;
+                }
+              } else if (bet.color === "red-violet") {
+                if ([0, 5].includes(win.number)) {
+                  payout = bet.contractMoney * 1.5;
+                }
+              } else if (bet.number === win.number) {
+                payout = bet.contractMoney * 9;
+              }
+
+              const winner = await ColorPredictionWinner.create({
+                userId: bet.userId,
+                fullName: bet.fullName,
+                result: win.color,
+                period: bet.period,
+                number: bet.number,
+                amount: payout,
+                date: new Date(getIstTime().date).toDateString(),
+              });
+              console.log(winner);
+              const wallects = await Wallet.findOneAndUpdate(
+                { userId: bet.userId },
+                {
+                  $inc: {
+                    investmentAmount: +payout,
+                  },
+                },
+                { new: true }
+              );
+              console.log({ payout });
+
+              
+            }
+
+            await ColorPrediction.deleteMany({});
+            await ColorPredictionHistory.deleteMany({});
+            // Assuming you want to return the total payout in the response
+            // return res.status(200).json({
+            //   totalPayout: totalPayout,
+            // });
+          } catch (error) {
+            console.log(error);
+            return res.status(400).json({
+              message: error.toString(),
+            });
+          }
+        } else {
+          await backAmount();
+          console.log("All Amount Back Done");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    { scheduled: true, timezone: "Asia/Kolkata" }
+  );
+};
+
+module.exports = runColorPrediction;

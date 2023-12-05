@@ -34,6 +34,7 @@ const verifyJWT = async (req, res, next) => {
 const verifyAdmin = async (req, res, next) => {
   try {
     const requester = req.auth;
+    console.log({ requester });
     const requesterAccount = await User.findOne({
       $or: [{ userId: requester }, { email: requester }],
     });

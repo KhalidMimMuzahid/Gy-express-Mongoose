@@ -12,6 +12,7 @@ const contactusRouter = require("./contactus.routes");
 const dashboardRouter = require("./dashboard.routes");
 const earningRouter = require("./earning.routes");
 const rewardRouter = require("./reward.routes");
+const colordRouter = require("./colorPrediction.routes");
 
 const middleware = [verifyJWT, verifyUser];
 router.use(middleware);
@@ -32,10 +33,12 @@ router.use(ticketHistoryRouter);
 //contactus router
 router.use(contactusRouter);
 // dashboard routers
-router.use(dashboardRouter)
+router.use(dashboardRouter);
 // Earning routers
-router.use(earningRouter)
+router.use(earningRouter);
 // Reward routers
-router.use(rewardRouter)
+router.use(rewardRouter);
+// Color Predected routers
+router.use(colordRouter);
 
 module.exports = router;
