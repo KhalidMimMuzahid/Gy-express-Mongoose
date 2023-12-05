@@ -60,7 +60,7 @@ const createColorPrediction = async (req, res) => {
       if (history) {
         await ColorPredictionHistory.findOneAndUpdate(
           { $and: [{ color: color }, { number: number }] },
-          {
+          { 
             $inc: {
               numberOfUser: contractCount,
               amount: totalContractMoney,
@@ -70,6 +70,7 @@ const createColorPrediction = async (req, res) => {
         );
       } else {
         await ColorPredictionHistory.create({
+          period: period,
           color: color,
           number: number,
           numberOfUser: contractCount,

@@ -7,12 +7,13 @@ const backAmount = require("./backAmount");
 const ColorPrediction = require("../models/colourPrediction ");
 const ColorPredictionWinner = require("../models/colourPredictionWinner");
 const ColorPredictionHistory = require("../models/colourPredictionHistory");
+const generateUniqueIdByDate = require("../config/generateUniqueIdByDate");
 
 const runColorPrediction = () => {
   cron.schedule(
-    // "00 00 00 * * *", // This function will run Every Night 12 AM IST
-    // "*/3 * * * *", // Every 20 sec
-    // "*/3 * * * */ *", // every 3 sec
+    "00 00 00 * * *", // This function will run Every Night 12 AM IST
+    // "*/3 * * * *", // Every 20 min
+    // "*/10 * * * */ *", // every 3 sec
     async (res, req) => {
       try {
         const win = await selectWin.findOne({ id: "colorPredectionId" });
@@ -89,7 +90,6 @@ const runColorPrediction = () => {
             await ColorPrediction.deleteMany({});
             await ColorPredictionHistory.deleteMany({});
             await selectWin.deleteMany({});
-
           } catch (error) {
             console.log(error);
             return res.status(400).json({
@@ -97,6 +97,7 @@ const runColorPrediction = () => {
             });
           }
         } else {
+          await generateUniqueIdByDate();
           await backAmount();
           console.log("All Amount Back Done");
         }

@@ -12,7 +12,8 @@ const {
   googleLogin,
   checkIsLoggedIn,
   checkUserEmail,
-  checkValidOTP
+  checkValidOTP,
+  getPeriodId,
 } = require("../../controller/public/auth.controller");
 const {
   registerValidator,
@@ -23,7 +24,7 @@ const router = require("express").Router();
 
 router.post("/register", registerValidator, registerController);
 router.post("/login", loginValidator, loginController);
-router.put("/verify_user/:token", verifyUser)
+router.put("/verify_user/:token", verifyUser);
 router.post("/create_otp", createOtpController);
 router.get("/get_sponsor/:userId", getSponsorNameController);
 router.post("/forgot_password", ForgotPasswordController);
@@ -35,6 +36,6 @@ router.post("/google_login", googleLogin);
 router.post("/check_login", checkIsLoggedIn);
 router.get("/get_check_email/:userEmail", checkUserEmail);
 router.get("/get_check_otp/:otpCode", checkValidOTP);
-
+router.get("/get_period_id", getPeriodId);
 
 module.exports = router;
