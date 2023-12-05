@@ -7,6 +7,7 @@ const colourPredictionWinnerSchema = new mongoose.Schema(
     result: {
       type: String,
     },
+    box:Number,
     period: String,
     date: String,
     number: Number,

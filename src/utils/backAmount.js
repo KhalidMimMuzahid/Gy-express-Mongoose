@@ -1,5 +1,6 @@
 const ColorPrediction = require("../models/colourPrediction ");
 const ColorPredictionHistory = require("../models/colourPredictionHistory");
+const selectWin = require("../models/selectWin");
 const Wallet = require("../models/wallet.model");
 
 const backAmount = async () => {
@@ -26,6 +27,7 @@ const backAmount = async () => {
 
       await ColorPrediction.deleteMany({});
       await ColorPredictionHistory.deleteMany({});
+      await selectWin.deleteMany({});
     } else {
       console.log("No ColorPrediction documents found.");
     }

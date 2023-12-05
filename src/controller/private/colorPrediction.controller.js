@@ -23,9 +23,9 @@ const AllColorPredictionsHistory = async (req, res) => {
 const SelectWinner = async (req, res) => {
   try {
     const { color, number } = req.body;
-    const select = await selectWin.find({});
-
-    if (select) {
+    const select = await selectWin.findOne({id: "colorPredectionId"});
+console.log(select)
+    if (select?.id ==="colorPredectionId") {
       await selectWin.findOneAndUpdate(
         { id: "colorPredectionId" },
         {
@@ -36,14 +36,18 @@ const SelectWinner = async (req, res) => {
         },
         { new: true }
       );
+      return res.status(200).json({ message: "Winner Selected updated" });
+
     } else {
       await selectWin.create({
         id: "colorPredectionId",
         color: color,
         number: number,
       });
+      return res.status(200).json({ message: "Winner Selected createx" });
+
     }
-    return res.status(200).json({ message: "Winner Selected" });
+    // return res.status(200).json({ message: "Winner Selected" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Something want Wrong" });

@@ -11,6 +11,7 @@ const createColorPrediction = async (req, res) => {
       number,
       contractMoney,
       period,
+      box,
       contractCount,
       totalContractMoney,
     } = req.body;
@@ -24,6 +25,7 @@ const createColorPrediction = async (req, res) => {
         fullName: user.fullName,
         color: color,
         number: number,
+        box:box,
         period: period,
         contractMoney: contractMoney,
         contractCount: contractCount,
@@ -34,6 +36,7 @@ const createColorPrediction = async (req, res) => {
         userId: userId,
         fullName: user.fullName,
         color: color,
+        box:box,
         number: number,
         period: period,
         contractMoney: contractMoney,

@@ -8,6 +8,7 @@ const colourPredictionAllSchema = new mongoose.Schema(
       type: String,
       enm: ["red", "green", "violet", "red-violet", "green-violet"],
     },
+    box:Number,
     period: String,
     date: String,
     number: Number,
