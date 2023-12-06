@@ -8,6 +8,7 @@ const ColorPrediction = require("../models/colourPrediction ");
 const ColorPredictionWinner = require("../models/colourPredictionWinner");
 const ColorPredictionHistory = require("../models/colourPredictionHistory");
 const generateUniqueIdByDate = require("../config/generateUniqueIdByDate");
+const PeriodRecord = require("../models/periodRecord");
 
 const runColorPrediction = () => {
   cron.schedule(
@@ -23,10 +24,10 @@ const runColorPrediction = () => {
             const bets = await ColorPrediction.find({
               $or: [{ color: win.color }, { number: win.number }],
             });
-            // console.log(bets);
+            let totalAmount = 0;
+            console.log(bets);
             for (const bet of bets) {
               let payout = 0;
-
               if (bet.color === "green") {
                 if (bet.box === win.number) {
                   payout = bet.contractMoney * 9;
@@ -66,12 +67,12 @@ const runColorPrediction = () => {
               }
 
               const winner = await ColorPredictionWinner.create({
-                userId: bet.userId,
-                fullName: bet.fullName,
-                result: win.color,
-                period: bet.period,
-                number: bet.number,
-                amount: payout,
+                userId: bet?.userId,
+                fullName: bet?.fullName,
+                result: win?.color,
+                period: bet?.period,
+                number: bet?.number,
+                amount: payout || 0,
                 date: new Date(getIstTime().date).toDateString(),
               });
               // console.log(winner);
@@ -84,14 +85,25 @@ const runColorPrediction = () => {
                 },
                 { new: true }
               );
+              totalAmount += payout;
               console.log({ payout });
             }
+            // console.log("total AMount:", totalAmount);
+            // console.log("my id", bets[0].period);
+            const periodId = bets[0].period;
+
+            await PeriodRecord.create({
+              periodId: periodId,
+              color: win.color,
+              number: win.number,
+              price: totalAmount,
+            });
 
             await ColorPrediction.deleteMany({});
             await ColorPredictionHistory.deleteMany({});
             await selectWin.deleteMany({});
             await generateUniqueIdByDate();
-            conslole.log("Color Prediction Select Winner Done");
+            console.log("Color Prediction Select Winner Done");
           } catch (error) {
             console.log(error);
             return res.status(400).json({

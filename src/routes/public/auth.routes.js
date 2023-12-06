@@ -14,6 +14,7 @@ const {
   checkUserEmail,
   checkValidOTP,
   getPeriodId,
+  getAllPeriodRecord,
 } = require("../../controller/public/auth.controller");
 const {
   registerValidator,
@@ -37,5 +38,6 @@ router.post("/check_login", checkIsLoggedIn);
 router.get("/get_check_email/:userEmail", checkUserEmail);
 router.get("/get_check_otp/:otpCode", checkValidOTP);
 router.get("/get_period_id", getPeriodId);
+router.get("/get_all_period_record", getAllPeriodRecord);
 
 module.exports = router;

@@ -18,6 +18,7 @@ const generateUniqueIdByDate = require("../../config/generateUniqueIdByDate");
 const generateRandomPassword = require("../../config/generateRandomPassword");
 const { OAuth2Client } = require("google-auth-library");
 const ProidId = require("../../models/periodId.model");
+const PeriodRecord = require("../../models/periodRecord");
 const secretToken =
   "350224658302-etk8h8jcju1qbrjri8nrkd0uamgs7a62.apps.googleusercontent.com";
 const clientSecret = "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";
@@ -179,8 +180,10 @@ const loginController = async (req, res) => {
     }
   }
   try {
-    const { email,userId, password } = req.body;
-    const user = await User.findOne({ $or: [{ email: email }, { userId: userId }] });
+    const { email, userId, password } = req.body;
+    const user = await User.findOne({
+      $or: [{ email: email }, { userId: userId }],
+    });
 
     if (!user) {
       return res.status(400).json({ message: "User is not found" });
@@ -795,13 +798,13 @@ const checkValidOTP = async (req, res) => {
   }
 };
 
-const getPeriodId = async(req, res)=>{
+const getPeriodId = async (req, res) => {
   try {
     const periodId = await ProidId.find({});
-    if(periodId){
-      return res.status(200).json({data:periodId})
+    if (periodId) {
+      return res.status(200).json({ data: periodId });
     } else {
-      return res.status.json({message:"Data Not Found!"})
+      return res.status.json({ message: "Data Not Found!" });
     }
   } catch (error) {
     console.log(error);
@@ -809,8 +812,23 @@ const getPeriodId = async(req, res)=>{
       message: error.toString(),
     });
   }
-}
+};
 
+const getAllPeriodRecord = async (req, res) => {
+  try {
+    const allPeriodRecord = await PeriodRecord.find({}).sort({ createdAt: -1 });
+    if (allPeriodRecord) {
+      return res.status(200).json({ data: allPeriodRecord });
+    } else {
+      return res.status.json({ message: "Data Not Found!" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      message: error.toString(),
+    });
+  }
+};
 module.exports = {
   registerController,
   loginController,
@@ -826,5 +844,6 @@ module.exports = {
   checkIsLoggedIn,
   checkUserEmail,
   checkValidOTP,
-  getPeriodId
+  getPeriodId,
+  getAllPeriodRecord,
 };
