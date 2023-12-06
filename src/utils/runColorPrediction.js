@@ -17,7 +17,7 @@ const runColorPrediction = () => {
     async (res, req) => {
       try {
         const win = await selectWin.findOne({ id: "colorPredectionId" });
-        console.log({ win });
+        // console.log({ win });
         if (win?.color || win?.number) {
           try {
             const bets = await ColorPrediction.find({
@@ -74,7 +74,7 @@ const runColorPrediction = () => {
                 amount: payout,
                 date: new Date(getIstTime().date).toDateString(),
               });
-              console.log(winner);
+              // console.log(winner);
               const wallects = await Wallet.findOneAndUpdate(
                 { userId: bet.userId },
                 {
@@ -90,6 +90,8 @@ const runColorPrediction = () => {
             await ColorPrediction.deleteMany({});
             await ColorPredictionHistory.deleteMany({});
             await selectWin.deleteMany({});
+            await generateUniqueIdByDate();
+            conslole.log("Color Prediction Select Winner Done");
           } catch (error) {
             console.log(error);
             return res.status(400).json({
