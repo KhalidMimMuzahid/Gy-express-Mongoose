@@ -10,7 +10,7 @@ const WiningRefferalIncomeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    incomeFrom: {
+    incomeFromUserId: {
       type: String,
       required: true,
     },
@@ -22,6 +22,7 @@ const WiningRefferalIncomeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    percentage: Number,
     amount: {
       type: Number,
       required: true,
@@ -34,27 +35,17 @@ const WiningRefferalIncomeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    
-    selfPackageInfo: {
-      type: {
-        amount: {
-          type: Number,
-          required: true,
-        },
-        date: String,
-        time: String,
-      },
-      required: true,
-    },
-    transactionID: {
+    type: {
       type: String,
       required: true,
-      unique: true,
     },
   },
   { timestamps: true }
 );
 
-const WiningRefferalIncome = mongoose.model("WiningRefferalIncome", WiningRefferalIncomeSchema);
+const WiningRefferalIncome = mongoose.model(
+  "WiningRefferalIncome",
+  WiningRefferalIncomeSchema
+);
 
 module.exports = WiningRefferalIncome;

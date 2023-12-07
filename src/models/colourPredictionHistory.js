@@ -6,11 +6,12 @@ const colourPredictionHistorySchema = new mongoose.Schema(
       type: String,
       enm: ["red", "green", "violet", "red-violet", "green-violet"],
     },
-    period:String,
-    box:Number,
+    period: String,
+    box: Number,
     number: Number,
     numberOfUser: Number,
     amount: Number,
+    priceCL: Number,
   },
   { timestamps: true }
 );

@@ -40,7 +40,7 @@ const generateUniqueIdByDate = async () => {
           period: newUserID,
         },
       },
-      { new: true }
+      { new: true, upsert: true }
     );
   } else {
     const periodId = userIDGenerator();

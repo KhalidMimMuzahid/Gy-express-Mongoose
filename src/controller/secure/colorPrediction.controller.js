@@ -18,6 +18,7 @@ const createColorPrediction = async (req, res) => {
     const userId = req.auth;
     console.log({ userId });
     const user = await User.findOne({ userId: userId });
+    console.log({ user });
     const wallet = await Wallet.findOne({ userId });
     if (wallet.depositBalance >= Number(totalContractMoney)) {
       const colorPrediction = await ColorPrediction.create({
@@ -54,39 +55,91 @@ const createColorPrediction = async (req, res) => {
         update,
         options
       );
-      await ColorPredictionHistory.findOneAndUpdate(
-        { $or: [{ color: color }, { number: number }] },
-        {
-          $inc: {
-            numberOfUser: contractCount,
-            amount: totalContractMoney,
-          },
-        },
-        { new: true }
-      );
-      // const history = await ColorPredictionHistory.findOne({
-      //   $and: [{ color: color }, { number: number }],
-      // });
-      // if (history) {
-      //   await ColorPredictionHistory.findOneAndUpdate(
-      //     { $and: [{ color: color }, { number: number }] },
-      //     {
-      //       $inc: {
-      //         numberOfUser: contractCount,
-      //         amount: totalContractMoney,
-      //       },
-      //     },
-      //     { new: true }
-      //   );
-      // } else {
-      //   await ColorPredictionHistory.create({
-      //     period: period,
-      //     color: color,
-      //     number: number,
-      //     numberOfUser: contractCount,
-      //     amount: totalContractMoney,
-      //   });
+      // calculatePriceCL(color, number, box, totalContractMoney);
+      // function calculatePriceCL(color, number, box, totalContractMoney) {
+      //  if(number === 0){
+      //   if(box === 0){
+      //     return totalContractMoney * 9;
+      //   } else if (number ===  )
+      //  }
+
+      let payout = 0;
+      if (color === "green") {
+        if (box === 0) {
+          payout = totalContractMoney * 9;
+        } else if ([1, 3, 7, 9].includes(number)) {
+          payout = totalContractMoney * 2;
+        } else if (number === 5) {
+          payout = totalContractMoney * 1.5;
+        }
+      } else if (color === "red") {
+        if (box === number) {
+          payout = totalContractMoney * 9;
+        } else if ([2, 4, 6, 8].includes(number)) {
+          payout = totalContractMoney * 2;
+        } else if (number === 0) {
+          payout = totalContractMoney * 1.5;
+        }
+      } else if (color === "violet") {
+        if (box === number) {
+          payout = totalContractMoney * 9;
+        } else if ([0, 5].includes(number)) {
+          payout = totalContractMoney * 4.5;
+        }
+      } else if (color === "red-violet") {
+        if (box === number) {
+          payout = totalContractMoney * 9;
+        } else if ([0, 5].includes(number)) {
+          payout = totalContractMoney * 1.5;
+        }
+      } else if (color === "green-violet") {
+        if (box === number) {
+          payout = totalContractMoney * 9;
+        } else if ([0, 5].includes(number)) {
+          payout = totalContractMoney * 1.5;
+        }
+      }
+      // else if (number === number) {
+      //   payout = bet.contractMoney * 9;
       // }
+      // }
+      console.log({ payout });
+      // await ColorPredictionHistory.findOneAndUpdate(
+      //   { $or: [{ color: color }, { number: number }] },
+      //   {
+      //     $inc: {
+      //       numberOfUser: contractCount,
+      //       amount: totalContractMoney,
+      //       priceCL: payout,
+      //     },
+      //   },
+      //   { new: true }
+      // );
+      const history = await ColorPredictionHistory.findOne({
+        $and: [{ color: color }, { number: number }],
+      });
+      if (history) {
+        await ColorPredictionHistory.findOneAndUpdate(
+          { $and: [{ color: color }, { number: number }] },
+          {
+            $inc: {
+              numberOfUser: contractCount,
+              amount: totalContractMoney,
+              priceCL: payout,
+            },
+          },
+          { new: true }
+        );
+      } else {
+        await ColorPredictionHistory.create({
+          period: period,
+          color: color,
+          number: number,
+          numberOfUser: contractCount,
+          amount: totalContractMoney,
+          priceCL: payout,
+        });
+      }
       res.status(201).json({
         message: "Color prediction saved successfully.",
         data: colorPrediction,
@@ -116,5 +169,4 @@ const getColorPrediction = async (req, res) => {
   }
 };
 
-
-module.exports = { createColorPrediction ,getColorPrediction };
+module.exports = { createColorPrediction, getColorPrediction };
