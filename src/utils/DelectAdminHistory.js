@@ -4,7 +4,7 @@ const DeleteAdminHistory = async () => {
   try {
     const updateResult = await ColorPredictionHistory.updateMany(
       {},
-      { $set: { numberOfUser: 0, amount: 0 } }
+      { $set: { numberOfUser: 0, amount: 0, priceCL: 0 } }
     );
 
     console.log(`Updated ${updateResult.nModified} documents`);

@@ -1,22 +1,40 @@
-const getIstTime = require("../config/getTime");
-const cron = require("node-cron");
-
-const Wallet = require("../models/wallet.model");
-const selectWin = require("../models/selectWin");
-const backAmount = require("./backAmount");
-const ColorPrediction = require("../models/colourPrediction ");
-const ColorPredictionWinner = require("../models/colourPredictionWinner");
-const ColorPredictionHistory = require("../models/colourPredictionHistory");
 const generateUniqueIdByDate = require("../config/generateUniqueIdByDate");
+const ColorPrediction = require("../models/colourPrediction ");
+const ColorPredictionHistory = require("../models/colourPredictionHistory");
+const ColorPredictionWinner = require("../models/colourPredictionWinner");
 const PeriodRecord = require("../models/periodRecord");
+const selectWin = require("../models/selectWin");
+const Wallet = require("../models/wallet.model");
 const DeleteAdminHistory = require("./DelectAdminHistory");
 
-const runColorPrediction = () => {
-  cron.schedule(
-    "00 00 00 * * *", // This function will run Every Night 12 AM IST
-    // "*/3 * * * *", // Every 20 min
-    // "*/10 * * * */ *", // every 3 sec
-    async (res, req) => {
+const AutoWinnerSelect = async () => {
+  try {
+    const lowPriceCL = await ColorPredictionHistory.findOne({})
+      .sort({ priceCL: 1 })
+      .lean();
+    console.log({ lowPriceCL });
+    if (lowPriceCL.length > 0) {
+      const select = await selectWin.findOne({ id: "colorPredectionId" });
+      // console.log(select);
+      if (select?.id === "colorPredectionId") {
+        await selectWin.findOneAndUpdate(
+          { id: "colorPredectionId" },
+          {
+            $set: {
+              color: lowPriceCL?.color,
+              number: lowPriceCL?.number,
+            },
+          },
+          { new: true }
+        );
+        //   return res.status(200).json({ message: "Winner Selected updated" });
+      } else {
+        await selectWin.create({
+          id: "colorPredectionId",
+          color: lowPriceCL?.color,
+          number: lowPriceCL?.number,
+        });
+      }
       try {
         const win = await selectWin.findOne({ id: "colorPredectionId" });
         // console.log({ win });
@@ -112,19 +130,19 @@ const runColorPrediction = () => {
             });
           }
         } else {
-
-          await generateUniqueIdByDate();
-          await DeleteAdminHistory();
-          await selectWin.deleteMany({});
-          await backAmount();
+          
+        //   await generateUniqueIdByDate();
+        //   await DeleteAdminHistory();
+        //   await selectWin.deleteMany({});
+        //   await backAmount();
           console.log("All Amount Back Done");
         }
       } catch (error) {
         console.log(error);
       }
-    },
-    { scheduled: true, timezone: "Asia/Kolkata" }
-  );
+    }
+  } catch (error) {
+    console.log(error);
+  }
 };
-
-module.exports = runColorPrediction;
+module.exports = AutoWinnerSelect;
