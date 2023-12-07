@@ -12,6 +12,7 @@ const walletSchema = new mongoose.Schema({
   indirectIncome: Number,
   depositBalance: Number,
   totalIncome: Number,
+  winingWallect: Number,
   activeIncome: Number,
   joiningBonus: Number,
 });

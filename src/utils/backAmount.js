@@ -15,7 +15,7 @@ const backAmount = async () => {
           { userId: bet.userId },
           {
             $inc: {
-              investmentAmount: +bet.totalContractMoney,
+              depositBalance: +bet.totalContractMoney,
             },
           },
           { new: true }
@@ -26,8 +26,7 @@ const backAmount = async () => {
       }
 
       await ColorPrediction.deleteMany({});
-      await ColorPredictionHistory.deleteMany({});
-      await selectWin.deleteMany({});
+      // await selectWin.deleteMany({});
     } else {
       console.log("No ColorPrediction documents found.");
     }

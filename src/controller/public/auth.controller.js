@@ -180,9 +180,9 @@ const loginController = async (req, res) => {
     }
   }
   try {
-    const { email, userId, password } = req.body;
+    const { email, password } = req.body;
     const user = await User.findOne({
-      $or: [{ email: email }, { userId: userId }],
+      $or: [{ email: email }, { userId: email }],
     });
 
     if (!user) {

@@ -9,6 +9,7 @@ const ColorPredictionWinner = require("../models/colourPredictionWinner");
 const ColorPredictionHistory = require("../models/colourPredictionHistory");
 const generateUniqueIdByDate = require("../config/generateUniqueIdByDate");
 const PeriodRecord = require("../models/periodRecord");
+const DeleteAdminHistory = require("./DelectAdminHistory");
 
 const runColorPrediction = () => {
   cron.schedule(
@@ -80,7 +81,7 @@ const runColorPrediction = () => {
                 { userId: bet.userId },
                 {
                   $inc: {
-                    investmentAmount: +payout,
+                    winingWallect: +payout,
                   },
                 },
                 { new: true }
@@ -100,9 +101,9 @@ const runColorPrediction = () => {
             });
 
             await ColorPrediction.deleteMany({});
-            await ColorPredictionHistory.deleteMany({});
             await selectWin.deleteMany({});
             await generateUniqueIdByDate();
+            await DeleteAdminHistory();
             console.log("Color Prediction Select Winner Done");
           } catch (error) {
             console.log(error);
@@ -112,6 +113,8 @@ const runColorPrediction = () => {
           }
         } else {
           await generateUniqueIdByDate();
+          await DeleteAdminHistory();
+          await selectWin.deleteMany({});
           await backAmount();
           console.log("All Amount Back Done");
         }
