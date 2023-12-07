@@ -54,7 +54,7 @@ const runColorPrediction = () => {
                 if (bet.box === win.number) {
                   payout = bet.contractMoney * 9;
                 } else if ([0, 5].includes(win.number)) {
-                  payout = bet.contractMoney * 15.5;
+                  payout = bet.contractMoney * 1.5;
                 }
               } else if (bet.color === "green-violet") {
                 if (bet.box === win.number) {
