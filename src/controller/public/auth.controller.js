@@ -47,12 +47,12 @@ const registerController = async (req, res) => {
       password,
       confirmPassword,
       mobile,
-      sponsorid,
+      sponsorId,
       sponsorName,
       otpCode,
       role,
     } = req.body;
-    if (!email || !password || !confirmPassword || !otpCode) {
+    if (!fullName || !email || !password || !role || !confirmPassword) {
       return res.status(400).json({ message: "Please Enter all the Feilds" });
     } else if (!password === confirmPassword) {
       return res.status(400).json({ message: "Password dosen't match" });
@@ -70,19 +70,19 @@ const registerController = async (req, res) => {
     const userExists = await User.findOne({ email: email });
     const otp = await Otp.findOne({ email: email });
     const sponsorname = await User.findOne({
-      userId: sponsorid?.toUpperCase(),
+      userId: sponsorId?.toUpperCase(),
     });
 
     if (!userExists) {
       if (otpCode && parseInt(otp?.code) === parseInt(otpCode)) {
         const user = await User.create({
-          fullName: "",
+          fullName: fullName,
           userId: generatedUserId,
           email: email,
           password: password,
-          mobile: "",
-          sponsorId: sponsorid || "ADMIN",
-          sponsorName: sponsorname?.fullName || "Admin",
+          mobile: mobile,
+          sponsorId: sponsorId?.toUpperCase() || "ADMIN",
+          sponsorName: sponsorName || "Admin",
           token: generateToken(email),
           userStatus: true,
           isActive: false,
@@ -180,10 +180,8 @@ const loginController = async (req, res) => {
     }
   }
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({
-      $or: [{ email: email }, { userId: email }],
-    });
+    const { userId, password } = req.body;
+    const user = await User.findOne({ userId: userId?.toUpperCase() });
 
     if (!user) {
       return res.status(400).json({ message: "User is not found" });
@@ -279,7 +277,7 @@ const createOtpController = async (req, res) => {
       }
     }
     // for register user
-    if (email) {
+    if (email && mobile) {
       const existingOtp = Otp.findOne({ email: email });
       if (existingOtp) {
         await Otp.deleteOne({ email: email });
@@ -589,20 +587,20 @@ const googleLogin = async (req, res) => {
     });
     const { payload } = ticket;
 
-    if (req.body.sponsorid) {
-      const checkSponsorid = await User.findOne({
-        username: req.body.sponsorid,
+    if (req.body.sponsorId) {
+      const checkSponsorId = await User.findOne({
+        username: req.body.sponsorId,
       });
-      // if (!checkSponsorid) {
-      //   return r.rest(res, false, "Invalid sponsor id");
-      // }
+      if (!checkSponsorId) {
+        return r.rest(res, false, "Invalid sponsor id");
+      }
     }
-    // const checkMobile = await User.findOne({
-    //   mobile: req.body.mobile,
-    // });
-    // if (checkMobile) {
-    //   return res.status(403).json("Already exist mobile");
-    // }
+    const checkMobile = await User.findOne({
+      mobile: req.body.mobile,
+    });
+    if (checkMobile) {
+      return res.status(403).json("Already exist mobile");
+    }
     function encryptPassword(plainPassword, saltRounds = 10) {
       return bcrypt.hashSync(plainPassword, saltRounds);
     }
@@ -684,8 +682,8 @@ const googleLogin = async (req, res) => {
           const user = await User.create({
             userId: generatedUserId,
             fullName: username,
-            sponsorId: req.body.sponsorid || "ADMIN",
-            sponsorName: sponsorName?.fullName || "Admin",
+            sponsorId: req.body.sponsorId || "admin",
+            sponsorName: sponsorName.sponsorName || "admin",
             password: password,
             email: email,
 
