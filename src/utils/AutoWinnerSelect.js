@@ -145,4 +145,6 @@ const AutoWinnerSelect = async () => {
     console.log(error);
   }
 };
+
+//exporting here
 module.exports = AutoWinnerSelect;
