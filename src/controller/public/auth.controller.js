@@ -814,9 +814,13 @@ const getPeriodId = async (req, res) => {
 
 const getInitialTime = async (req, res) => {
   try {
-    const result = await ProidId.findOne().sort({ updatedAt: -1 });
+    const result = await ProidId.findOne(
+      {},
+      { updatedAt: 1, _id: 0 },
+      { updatedAt: -1 }
+    );
 
-    console.log({ result });
+    // console.log({ result });
     if (result) {
       return res.status(200).json({ data: result });
     } else {
