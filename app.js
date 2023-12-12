@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./src/config/db");
-const port = 2023;
+const port = 8787;
 const app = express();
 
 const secureRoutes = require("./src/routes/secure/index");
