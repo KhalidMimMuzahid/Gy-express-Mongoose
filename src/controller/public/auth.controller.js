@@ -812,6 +812,24 @@ const getPeriodId = async (req, res) => {
   }
 };
 
+const getInitialTime = async (req, res) => {
+  try {
+    const result = await ProidId.findOne().sort({ updatedAt: -1 });
+
+    console.log({ result });
+    if (result) {
+      return res.status(200).json({ data: result });
+    } else {
+      return res.status.json({ message: "Data Not Found!" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      message: error.toString(),
+    });
+  }
+};
+
 const getAllPeriodRecord = async (req, res) => {
   try {
     const allPeriodRecord = await PeriodRecord.find({}).sort({ createdAt: -1 });
@@ -843,5 +861,7 @@ module.exports = {
   checkUserEmail,
   checkValidOTP,
   getPeriodId,
+
+  getInitialTime,
   getAllPeriodRecord,
 };

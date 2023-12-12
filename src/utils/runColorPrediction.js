@@ -13,9 +13,10 @@ const DeleteAdminHistory = require("./DelectAdminHistory");
 
 const runColorPrediction = () => {
   cron.schedule(
-    "00 00 00 * * *", // This function will run Every Night 12 AM IST
+    // "00 00 00 * * *", // This function will run Every Night 12 AM IST
     // "*/3 * * * *", // Every 20 min
-    // "*/10 * * * */ *", // every 3 sec
+    "*/3 * * * *", // every 3 min
+    // "*/3 * * * * *", // every 3 sec
     async (res, req) => {
       try {
         const win = await selectWin.findOne({ id: "colorPredectionId" });
@@ -26,7 +27,7 @@ const runColorPrediction = () => {
               $or: [{ color: win.color }, { number: win.number }],
             });
             let totalAmount = 0;
-            console.log(bets);
+            // console.log(bets);
             for (const bet of bets) {
               let payout = 0;
               if (bet.color === "green") {
@@ -87,7 +88,7 @@ const runColorPrediction = () => {
                 { new: true }
               );
               totalAmount += payout;
-              console.log({ payout });
+              // console.log({ payout });
             }
             // console.log("total AMount:", totalAmount);
             // console.log("my id", bets[0].period);
@@ -104,23 +105,22 @@ const runColorPrediction = () => {
             await selectWin.deleteMany({});
             await generateUniqueIdByDate();
             await DeleteAdminHistory();
-            console.log("Color Prediction Select Winner Done");
+            // console.log("Color Prediction Select Winner Done");
           } catch (error) {
-            console.log(error);
+            // console.log(error);
             return res.status(400).json({
               message: error.toString(),
             });
           }
         } else {
-
           await generateUniqueIdByDate();
           await DeleteAdminHistory();
           await selectWin.deleteMany({});
           await backAmount();
-          console.log("All Amount Back Done");
+          // console.log("All Amount Back Done");
         }
       } catch (error) {
-        console.log(error);
+        // console.log({ error });
       }
     },
     { scheduled: true, timezone: "Asia/Kolkata" }

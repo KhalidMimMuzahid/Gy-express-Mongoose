@@ -156,7 +156,9 @@ const createColorPrediction = async (req, res) => {
 const getColorPrediction = async (req, res) => {
   try {
     const userId = req.auth;
-    const allBetting = await ColorPredictionAll.find({ userId });
+    const allBetting = await ColorPredictionAll.find({ userId }).sort({
+      updatedAt: -1,
+    });
 
     if (allBetting.length > 0) {
       return res.status(200).json({ data: allBetting });

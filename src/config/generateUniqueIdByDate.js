@@ -19,7 +19,7 @@ const userIDGenerator = () => {
 };
 
 const generateUniqueIdByDate = async () => {
-  const lastUser = await ProidId.findOne().sort({ createdAt: -1 });
+  const lastUser = await ProidId.findOne().sort({ updatedAt: -1 });
   if (lastUser) {
     const today = new Date();
     const todayStr = `${today.getFullYear()}${(today.getMonth() + 1)
@@ -33,15 +33,10 @@ const generateUniqueIdByDate = async () => {
       ?.toString()
       .padStart(4, "0")}`;
     console.log({ newUserID });
-    await ProidId.findOneAndUpdate(
-      { id: "colorPrediontionPriodID" },
-      {
-        $set: {
-          period: newUserID,
-        },
-      },
-      { new: true, upsert: true }
-    );
+
+    await ProidId.create({
+      period: newUserID,
+    });
   } else {
     const periodId = userIDGenerator();
     await ProidId.create({
