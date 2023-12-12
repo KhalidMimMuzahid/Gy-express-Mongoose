@@ -798,7 +798,7 @@ const checkValidOTP = async (req, res) => {
 
 const getPeriodId = async (req, res) => {
   try {
-    const periodId = await ProidId.find({});
+    const periodId = await ProidId.findOne().sort({ updatedAt: -1 });
     if (periodId) {
       return res.status(200).json({ data: periodId });
     } else {
@@ -812,17 +812,31 @@ const getPeriodId = async (req, res) => {
   }
 };
 
+const calculateTimeDifference = (lastPeriodIST) => {
+  const newDate = new Date();
+  const currentIST = newDate.toUTCString();
+  const date1 = new Date(lastPeriodIST);
+  const date2 = new Date(currentIST);
+  console.log("Date one: ", date1, "Date 2: ", date2);
+  // Calculate the difference in milliseconds
+  const timeDifference = Math.abs(date2 - date1);
+
+  // Convert milliseconds to seconds
+  const timeDifferenceInSeconds = timeDifference / 1000;
+
+  return timeDifferenceInSeconds;
+};
+
 const getInitialTime = async (req, res) => {
   try {
-    const result = await ProidId.findOne(
-      {},
-      { updatedAt: 1, _id: 0 },
-      { updatedAt: -1 }
-    );
+    const result = await ProidId.findOne().sort({ updatedAt: -1 });
 
     // console.log({ result });
-    if (result) {
-      return res.status(200).json({ data: result });
+    // console.log("Time is :", calculateTimeDifference(result?.updatedAt));
+    const initialTimeDuration =
+      180 - Math?.floor(calculateTimeDifference(result?.updatedAt));
+    if (initialTimeDuration) {
+      return res.status(200).json({ data: initialTimeDuration });
     } else {
       return res.status.json({ message: "Data Not Found!" });
     }
