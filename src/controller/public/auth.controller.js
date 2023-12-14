@@ -802,7 +802,7 @@ const getPeriodId = async (req, res) => {
     if (periodId) {
       return res.status(200).json({ data: periodId });
     } else {
-      return res.status.json({ message: "Data Not Found!" });
+      return res.status(400).json({ message: "Data Not Found!" });
     }
   } catch (error) {
     console.log(error);
@@ -817,13 +817,13 @@ const calculateTimeDifference = (lastPeriodIST) => {
   const currentIST = newDate.toUTCString();
   const date1 = new Date(lastPeriodIST);
   const date2 = new Date(currentIST);
-  console.log("Date one: ", date1, "Date 2: ", date2);
+  // console.log("Date one: ", date1, "Date 2: ", date2);
   // Calculate the difference in milliseconds
   const timeDifference = Math.abs(date2 - date1);
 
   // Convert milliseconds to seconds
   const timeDifferenceInSeconds = timeDifference / 1000;
-
+  // console.log({ timeDifferenceInSeconds });
   return timeDifferenceInSeconds;
 };
 
@@ -838,7 +838,7 @@ const getInitialTime = async (req, res) => {
     if (initialTimeDuration) {
       return res.status(200).json({ data: initialTimeDuration });
     } else {
-      return res.status.json({ message: "Data Not Found!" });
+      return res.status(400).json({ message: "Data Not Found!" });
     }
   } catch (error) {
     console.log(error);

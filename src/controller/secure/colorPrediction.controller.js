@@ -4,142 +4,131 @@ const ColorPredictionHistory = require("../../models/colourPredictionHistory");
 const Wallet = require("../../models/wallet.model");
 const getIstTime = require("../../config/getTime");
 const ColorPredictionAll = require("../../models/colourPredictionAll");
+const getUpdatePeriodHistoryArray = require("../../utils/getUpdatePeriodHistoryArray");
+
 const createColorPrediction = async (req, res) => {
   try {
     const {
-      color,
-      number,
-      contractMoney,
+      // color,
+      // number,
+      // box,
+      // contractMoney,
+      // contractCount,
+      option,
       period,
-      box,
-      contractCount,
       totalContractMoney,
     } = req.body;
+
+    console.log({ bettingData: req.body });
+
+    // res.json({ ok: 999 });
+
     const userId = req.auth;
-    console.log({ userId });
-    const user = await User.findOne({ userId: userId });
-    console.log({ user });
+    // console.log({ userId });
+    // return;
     const wallet = await Wallet.findOne({ userId });
+
+    console.log({ wallet });
     if (wallet.depositBalance >= Number(totalContractMoney)) {
       const colorPrediction = await ColorPrediction.create({
         userId: userId,
-        fullName: user.fullName,
-        color: color,
-        number: number,
-        box: box,
+        option,
         period: period,
-        contractMoney: contractMoney,
-        contractCount: contractCount,
         totalContractMoney: totalContractMoney,
         date: new Date(getIstTime().date).toDateString(),
       });
+      console.log({ colorPrediction });
+
       await ColorPredictionAll.create({
         userId: userId,
-        fullName: user.fullName,
-        color: color,
-        box: box,
-        number: number,
+        option,
         period: period,
-        contractMoney: contractMoney,
-        contractCount: contractCount,
         totalContractMoney: totalContractMoney,
         date: new Date(getIstTime().date).toDateString(),
       });
+
       const filter = { userId: userId };
       const update = {
         $inc: { depositBalance: -Number(totalContractMoney) },
       };
       const options = { new: true };
-      const investmentWallet = await Wallet.findOneAndUpdate(
-        filter,
-        update,
-        options
-      );
-      // calculatePriceCL(color, number, box, totalContractMoney);
-      // function calculatePriceCL(color, number, box, totalContractMoney) {
-      //  if(number === 0){
-      //   if(box === 0){
-      //     return totalContractMoney * 9;
-      //   } else if (number ===  )
-      //  }
+      await Wallet.findOneAndUpdate(filter, update, options);
 
-      let payout = 0;
-      if (color === "green") {
-        if (box === 0) {
-          payout = totalContractMoney * 9;
-        } else if ([1, 3, 7, 9].includes(number)) {
-          payout = totalContractMoney * 2;
-        } else if (number === 5) {
-          payout = totalContractMoney * 1.5;
+      // console.log({ xxx });
+      // return;
+      const updatePeriodHistoryArray = getUpdatePeriodHistoryArray(
+        option,
+        totalContractMoney
+      );
+
+      const updateMultipleData = async (
+        optionSelectedByUser,
+        updatePeriodHistoryArray
+      ) => {
+        try {
+          for (const eachData of updatePeriodHistoryArray) {
+            // const { option, amount, priceCL } = eachData;
+            let updateData = {
+              amount: eachData?.amount,
+              priceCL: eachData?.priceCL,
+            };
+            // const = { option, amount, priceCL }
+
+            console.log({
+              option: optionSelectedByUser,
+              period,
+              userId,
+            });
+            const isAlreadyBet = await ColorPrediction.find({
+              option: optionSelectedByUser,
+              period,
+              userId,
+            });
+            console.log({ isAlreadyBet });
+            console.log("updateData(before): ", updateData);
+            if (isAlreadyBet?.length <= 1) {
+              updateData.numberOfUser = 1;
+            }
+            console.log("updateData(after): ", updateData);
+            // Use findOneAndUpdate to update the document based on the 'option'
+
+            const { option, amount, priceCL } = eachData;
+
+            const result = await ColorPredictionHistory.findOneAndUpdate(
+              { option },
+              {
+                $inc: updateData,
+              },
+              { new: true }
+            );
+
+            // If the document with the specified 'option' does not exist, create a new one
+            if (!result) {
+              await ColorPredictionHistory.create({
+                numberOfUser: 1,
+                option,
+                amount,
+                priceCL,
+              });
+            }
+          }
+
+          console.log("Data updated successfully");
+        } catch (error) {
+          console.error("Error updating data:", error.message);
+          throw error; // You can choose to handle or rethrow the error
         }
-      } else if (color === "red") {
-        if (box === number) {
-          payout = totalContractMoney * 9;
-        } else if ([2, 4, 6, 8].includes(number)) {
-          payout = totalContractMoney * 2;
-        } else if (number === 0) {
-          payout = totalContractMoney * 1.5;
-        }
-      } else if (color === "violet") {
-        if (box === number) {
-          payout = totalContractMoney * 9;
-        } else if ([0, 5].includes(number)) {
-          payout = totalContractMoney * 4.5;
-        }
-      } else if (color === "red-violet") {
-        if (box === number) {
-          payout = totalContractMoney * 9;
-        } else if ([0, 5].includes(number)) {
-          payout = totalContractMoney * 1.5;
-        }
-      } else if (color === "green-violet") {
-        if (box === number) {
-          payout = totalContractMoney * 9;
-        } else if ([0, 5].includes(number)) {
-          payout = totalContractMoney * 1.5;
-        }
+      };
+
+      try {
+        await updateMultipleData(option, updatePeriodHistoryArray);
+        // Handle success
+      } catch (error) {
+        // Handle error
+
+        console.log({ error });
       }
-      // else if (number === number) {
-      //   payout = bet.contractMoney * 9;
-      // }
-      // }
-      console.log({ payout });
-      // await ColorPredictionHistory.findOneAndUpdate(
-      //   { $or: [{ color: color }, { number: number }] },
-      //   {
-      //     $inc: {
-      //       numberOfUser: contractCount,
-      //       amount: totalContractMoney,
-      //       priceCL: payout,
-      //     },
-      //   },
-      //   { new: true }
-      // );
-      const history = await ColorPredictionHistory.findOne({
-        $and: [{ color: color }, { number: number }],
-      });
-      if (history) {
-        await ColorPredictionHistory.findOneAndUpdate(
-          { $and: [{ color: color }, { number: number }] },
-          {
-            $inc: {
-              numberOfUser: contractCount,
-              amount: totalContractMoney,
-              priceCL: payout,
-            },
-          },
-          { new: true }
-        );
-      } else {
-        await ColorPredictionHistory.create({
-          period: period,
-          color: color,
-          number: number,
-          numberOfUser: contractCount,
-          amount: totalContractMoney,
-          priceCL: payout,
-        });
-      }
+
       res.status(201).json({
         message: "Color prediction saved successfully.",
         data: colorPrediction,

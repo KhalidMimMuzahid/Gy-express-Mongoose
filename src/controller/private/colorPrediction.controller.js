@@ -9,8 +9,9 @@ const WiningReferralPercentage = require("../../models/winingReferrlIncomePercen
 const AllColorPredictionsHistory = async (req, res) => {
   try {
     const allHistory = await ColorPredictionHistory.find({}).sort({
-      number: 1,
+      serial: 1,
     });
+
     if (allHistory) {
       return res.status(200).json({ data: allHistory });
     } else {
@@ -25,7 +26,8 @@ const AllColorPredictionsHistory = async (req, res) => {
 
 const SelectWinner = async (req, res) => {
   try {
-    const { color, number } = req.body;
+    // const { color, number } = req.body;
+    const { option } = req.body;
     const select = await selectWin.findOne({ id: "colorPredectionId" });
     console.log(select);
     if (select?.id === "colorPredectionId") {

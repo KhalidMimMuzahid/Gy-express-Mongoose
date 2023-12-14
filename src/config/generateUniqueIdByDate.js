@@ -19,6 +19,7 @@ const userIDGenerator = () => {
 };
 
 const generateUniqueIdByDate = async () => {
+  // console.log("xxxxxxxxxxxxyyyyyyyyyyyyy");
   const lastUser = await ProidId.findOne().sort({ updatedAt: -1 });
   if (lastUser) {
     const today = new Date();
@@ -39,6 +40,8 @@ const generateUniqueIdByDate = async () => {
     });
   } else {
     const periodId = userIDGenerator();
+
+    // console.log({ periodId });
     await ProidId.create({
       period: periodId,
     });

@@ -1,14 +1,23 @@
 const mongoose = require("mongoose");
 
-const colourPredictionHistorySchema = new mongoose.Schema(
+const colorPredictionHistorySchema = new mongoose.Schema(
   {
-    color: {
+    // -------------------
+    // color: {
+    //   type: String,
+    //   enm: ["red", "green", "violet", "red-violet", "green-violet"],
+    // },
+    // box: Number,
+    // number: Number,
+    // period: String,
+    // --------------------
+
+    serial: Number,
+    option: {
       type: String,
-      enm: ["red", "green", "violet", "red-violet", "green-violet"],
+      enum: ["y1", "y2", "y3", "y4", "y5", "y6", "y7", "y8", "y9", "y10"],
+      unique: true,
     },
-    period: String,
-    box: Number,
-    number: Number,
     numberOfUser: Number,
     amount: Number,
     priceCL: Number,
@@ -18,7 +27,7 @@ const colourPredictionHistorySchema = new mongoose.Schema(
 
 const ColorPredictionHistory = new mongoose.model(
   "colorPredictionHistory",
-  colourPredictionHistorySchema
+  colorPredictionHistorySchema
 );
 
 module.exports = ColorPredictionHistory;

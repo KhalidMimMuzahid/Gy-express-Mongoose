@@ -14,20 +14,24 @@ const DeleteAdminHistory = require("./DelectAdminHistory");
 const runColorPrediction = () => {
   cron.schedule(
     // "00 00 00 * * *", // This function will run Every Night 12 AM IST
-    // "*/3 * * * *", // Every 20 min
+    // "*/20 * * * *", // Every 20 min
     "*/3 * * * *", // every 3 min
-    // "*/3 * * * * *", // every 3 sec
+    // "*/20 * * * * *", // every 3 sec
     async (res, req) => {
       try {
+        // console.log("xxxxxxxxxxxxxxxxx");
         const win = await selectWin.findOne({ id: "colorPredectionId" });
-        // console.log({ win });
+        console.log({ win });
+
         if (win?.color || win?.number) {
           try {
+            // console.log("xxxxxxxxxzzzzzzzzzzzzuper");
             const bets = await ColorPrediction.find({
               $or: [{ color: win.color }, { number: win.number }],
             });
+
             let totalAmount = 0;
-            // console.log(bets);
+            // console.log("bets", bets);
             for (const bet of bets) {
               let payout = 0;
               if (bet.color === "green") {
@@ -90,19 +94,21 @@ const runColorPrediction = () => {
               totalAmount += payout;
               // console.log({ payout });
             }
+
             // console.log("total AMount:", totalAmount);
             // console.log("my id", bets[0].period);
-            const periodId = bets[0].period;
-
-            await PeriodRecord.create({
-              periodId: periodId,
-              color: win.color,
-              number: win.number,
-              price: totalAmount,
-            });
+            const periodId = bets[0]?.period;
+            if (periodId) {
+              await PeriodRecord.create({
+                periodId: periodId,
+                color: win.color,
+                number: win.number,
+                price: totalAmount,
+              });
+            }
 
             await ColorPrediction.deleteMany({});
-            await selectWin.deleteMany({});
+            await selectWin.deleteMany({}); // why are deleting all winner history here ?
             await generateUniqueIdByDate();
             await DeleteAdminHistory();
             // console.log("Color Prediction Select Winner Done");
@@ -116,7 +122,7 @@ const runColorPrediction = () => {
           await generateUniqueIdByDate();
           await DeleteAdminHistory();
           await selectWin.deleteMany({});
-          await backAmount();
+          await backAmount(); //   why are we  calling this api
           // console.log("All Amount Back Done");
         }
       } catch (error) {
