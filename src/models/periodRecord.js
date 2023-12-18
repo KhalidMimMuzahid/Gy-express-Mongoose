@@ -3,13 +3,13 @@ const mongoose = require("mongoose");
 const periodRecordSchema = new mongoose.Schema(
   {
     periodId: { type: String, require: true },
-    color: {
-      type: String,
-    },
-    price:String,
-    number: Number,
+    // color: {
+    //   type: String,
+    // },
+    option: String,
+    price: String,
+    // number: Number,
     date: String,
-   
   },
   { timestamps: true }
 );

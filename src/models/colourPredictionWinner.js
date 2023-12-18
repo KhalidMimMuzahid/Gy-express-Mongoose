@@ -2,15 +2,13 @@ const mongoose = require("mongoose");
 
 const colourPredictionWinnerSchema = new mongoose.Schema(
   {
+    // fullName: String,
+    // box:Number,
+    // number: Number,
     userId: { type: String, require: true },
-    fullName: String,
-    result: {
-      type: String,
-    },
-    box:Number,
+    result: String, // this result is for storing options
     period: String,
     date: String,
-    number: Number,
     amount: Number,
   },
   { timestamps: true }

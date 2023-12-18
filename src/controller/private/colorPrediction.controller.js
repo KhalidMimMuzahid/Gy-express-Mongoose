@@ -27,16 +27,17 @@ const AllColorPredictionsHistory = async (req, res) => {
 const SelectWinner = async (req, res) => {
   try {
     // const { color, number } = req.body;
-    const { option } = req.body;
+
+    const data = req.body;
+    // console.log({ option: data?.option });
     const select = await selectWin.findOne({ id: "colorPredectionId" });
-    console.log(select);
+    // console.log(select);
     if (select?.id === "colorPredectionId") {
       await selectWin.findOneAndUpdate(
         { id: "colorPredectionId" },
         {
           $set: {
-            color: color,
-            number: number,
+            option: data?.option,
           },
         },
         { new: true }
@@ -45,8 +46,7 @@ const SelectWinner = async (req, res) => {
     } else {
       await selectWin.create({
         id: "colorPredectionId",
-        color: color,
-        number: number,
+        option: data?.option,
       });
       return res.status(200).json({ message: "Winner Selected createx" });
     }
