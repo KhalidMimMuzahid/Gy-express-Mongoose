@@ -37,27 +37,26 @@ const runColorPrediction = () => {
             });
           }
         } else {
-          await ColorPrediction.deleteMany({});
-          await selectWin.deleteMany({}); // why are deleting all winner history here ?
-          await DeleteAdminHistory(); // deleting admin dashboard data when the period has ended
-          await generateUniqueIdByDate(); // generating periodId for every single period
-          // console.log("Color Prediction Select Winner Done");
-          // try {
-          //   const allHistories = ColorPredictionHistory.find({});
-          //   const autoSelectedOptionDetails = findLowestValueObject(
-          //     allHistories,
-          //     "priceCL"
-          //   );
+          try {
+            const allHistories = await ColorPredictionHistory.find({});
 
-          //   await updateDataBaseAccordingToWinner(
-          //     autoSelectedOptionDetails?.option
-          //   );
-          // } catch (error) {
-          //   // console.log(error);
-          //   return res.status(400).json({
-          //     message: error.toString(),
-          //   });
-          // }
+            // console.log({ allHistories });
+            const autoSelectedOptionDetails = findLowestValueObject(
+              allHistories,
+              "priceCL"
+            );
+
+            // console.log({ autoSelectedOptionDetails });
+
+            await updateDataBaseAccordingToWinner(
+              autoSelectedOptionDetails?.option
+            );
+          } catch (error) {
+            console.log({ error });
+            return res.status(400).json({
+              message: error.toString(),
+            });
+          }
 
           // await backAmount(); //   if any  how this period of bes has been cancel, off of users should get  their money back
           // console.log("All Amount Back Done");
