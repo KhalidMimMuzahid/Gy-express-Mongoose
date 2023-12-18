@@ -3,12 +3,16 @@ const mongoose = require("mongoose");
 const selectWinSchema = new mongoose.Schema(
   {
     id: { type: String, default: "colorPredectionId" },
-    color: {
+    // color: {
+    //   type: String,
+    // },
+    // number: Number,
+    option: {
       type: String,
+      enum: ["y1", "y2", "y3", "y4", "y5", "y6", "y7", "y8", "y9", "y10"],
     },
-    period: String,
-    date: String,
-    number: Number,
+    // date: String,
+    // period: String,
   },
   { timestamps: true }
 );

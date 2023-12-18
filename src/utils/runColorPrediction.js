@@ -10,6 +10,11 @@ const ColorPredictionHistory = require("../models/colourPredictionHistory");
 const generateUniqueIdByDate = require("../config/generateUniqueIdByDate");
 const PeriodRecord = require("../models/periodRecord");
 const DeleteAdminHistory = require("./DelectAdminHistory");
+const getWinnerFilterOptionArray = require("./getWinnerFilterOptionArray");
+const getPayOutAmount = require("./getPayOutAmount");
+const updateDataBaseAccordingToWinner = require("./updateDataBaseAccordingToWinner");
+const findMaxValueObject = require("./findMaxValueObject");
+const findLowestValueObject = require("./findLowestValueObject");
 
 const runColorPrediction = () => {
   cron.schedule(
@@ -19,99 +24,12 @@ const runColorPrediction = () => {
     // "*/20 * * * * *", // every 3 sec
     async (res, req) => {
       try {
-        // console.log("xxxxxxxxxxxxxxxxx");
         const win = await selectWin.findOne({ id: "colorPredectionId" });
         console.log({ win });
 
-        if (win?.color || win?.number) {
+        if (win?.option) {
           try {
-            // console.log("xxxxxxxxxzzzzzzzzzzzzuper");
-            const bets = await ColorPrediction.find({
-              $or: [{ color: win.color }, { number: win.number }],
-            });
-
-            let totalAmount = 0;
-            // console.log("bets", bets);
-            for (const bet of bets) {
-              let payout = 0;
-              if (bet.color === "green") {
-                if (bet.box === win.number) {
-                  payout = bet.contractMoney * 9;
-                } else if ([1, 3, 7, 9].includes(win.number)) {
-                  payout = bet.contractMoney * 2;
-                } else if (win.number === 5) {
-                  payout = bet.contractMoney * 1.5;
-                }
-              } else if (bet.color === "red") {
-                if (bet.box === win.number) {
-                  payout = bet.contractMoney * 9;
-                } else if ([2, 4, 6, 8].includes(win.number)) {
-                  payout = bet.contractMoney * 2;
-                } else if (win.number === 0) {
-                  payout = bet.contractMoney * 1.5;
-                }
-              } else if (bet.color === "violet") {
-                if (bet.box === win.number) {
-                  payout = bet.contractMoney * 9;
-                } else if ([0, 5].includes(win.number)) {
-                  payout = bet.contractMoney * 4.5;
-                }
-              } else if (bet.color === "red-violet") {
-                if (bet.box === win.number) {
-                  payout = bet.contractMoney * 9;
-                } else if ([0, 5].includes(win.number)) {
-                  payout = bet.contractMoney * 1.5;
-                }
-              } else if (bet.color === "green-violet") {
-                if (bet.box === win.number) {
-                  payout = bet.contractMoney * 9;
-                } else if ([0, 5].includes(win.number)) {
-                  payout = bet.contractMoney * 1.5;
-                }
-              } else if (bet.number === win.number) {
-                payout = bet.contractMoney * 9;
-              }
-
-              const winner = await ColorPredictionWinner.create({
-                userId: bet?.userId,
-                fullName: bet?.fullName,
-                result: win?.color,
-                period: bet?.period,
-                number: bet?.number,
-                amount: payout || 0,
-                date: new Date(getIstTime().date).toDateString(),
-              });
-              // console.log(winner);
-              const wallects = await Wallet.findOneAndUpdate(
-                { userId: bet.userId },
-                {
-                  $inc: {
-                    winingWallect: +payout,
-                  },
-                },
-                { new: true }
-              );
-              totalAmount += payout;
-              // console.log({ payout });
-            }
-
-            // console.log("total AMount:", totalAmount);
-            // console.log("my id", bets[0].period);
-            const periodId = bets[0]?.period;
-            if (periodId) {
-              await PeriodRecord.create({
-                periodId: periodId,
-                color: win.color,
-                number: win.number,
-                price: totalAmount,
-              });
-            }
-
-            await ColorPrediction.deleteMany({});
-            await selectWin.deleteMany({}); // why are deleting all winner history here ?
-            await generateUniqueIdByDate();
-            await DeleteAdminHistory();
-            // console.log("Color Prediction Select Winner Done");
+            await updateDataBaseAccordingToWinner(win?.option);
           } catch (error) {
             // console.log(error);
             return res.status(400).json({
@@ -119,10 +37,29 @@ const runColorPrediction = () => {
             });
           }
         } else {
-          await generateUniqueIdByDate();
-          await DeleteAdminHistory();
-          await selectWin.deleteMany({});
-          await backAmount(); //   why are we  calling this api
+          await ColorPrediction.deleteMany({});
+          await selectWin.deleteMany({}); // why are deleting all winner history here ?
+          await DeleteAdminHistory(); // deleting admin dashboard data when the period has ended
+          await generateUniqueIdByDate(); // generating periodId for every single period
+          // console.log("Color Prediction Select Winner Done");
+          // try {
+          //   const allHistories = ColorPredictionHistory.find({});
+          //   const autoSelectedOptionDetails = findLowestValueObject(
+          //     allHistories,
+          //     "priceCL"
+          //   );
+
+          //   await updateDataBaseAccordingToWinner(
+          //     autoSelectedOptionDetails?.option
+          //   );
+          // } catch (error) {
+          //   // console.log(error);
+          //   return res.status(400).json({
+          //     message: error.toString(),
+          //   });
+          // }
+
+          // await backAmount(); //   if any  how this period of bes has been cancel, off of users should get  their money back
           // console.log("All Amount Back Done");
         }
       } catch (error) {
@@ -134,3 +71,6 @@ const runColorPrediction = () => {
 };
 
 module.exports = runColorPrediction;
+
+
+
