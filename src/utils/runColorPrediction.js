@@ -40,13 +40,13 @@ const runColorPrediction = () => {
           try {
             const allHistories = await ColorPredictionHistory.find({});
 
-            // console.log({ allHistories });
+            console.log({ allHistories });
             const autoSelectedOptionDetails = findLowestValueObject(
               allHistories,
               "priceCL"
             );
 
-            // console.log({ autoSelectedOptionDetails });
+            console.log({ autoSelectedOptionDetails });
 
             await updateDataBaseAccordingToWinner(
               autoSelectedOptionDetails?.option
