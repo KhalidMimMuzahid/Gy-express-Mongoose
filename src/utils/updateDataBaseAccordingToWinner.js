@@ -3,6 +3,7 @@ const getIstTime = require("../config/getTime");
 const ColorPrediction = require("../models/colourPrediction ");
 const ColorPredictionAll = require("../models/colourPredictionAll");
 const ColorPredictionWinner = require("../models/colourPredictionWinner");
+const ProidId = require("../models/periodId.model");
 const PeriodRecord = require("../models/periodRecord");
 const selectWin = require("../models/selectWin");
 const Wallet = require("../models/wallet.model");
@@ -90,6 +91,14 @@ const updateDataBaseAccordingToWinner = async (option) => {
       option: option,
       // color: win.color,
       // number: win.number,
+      price: totalAmount,
+    });
+  } else {
+    // we need to create PeriodRecord document ==> first find the current period and create
+    const lastUser = await ProidId.findOne().sort({ updatedAt: -1 });
+    await PeriodRecord.create({
+      periodId: lastUser?.period,
+      option: option,
       price: totalAmount,
     });
   }
