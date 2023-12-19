@@ -28,8 +28,8 @@ const handleCOrsError = async (req, res, next) => {
 };
 // Middleware
 const middleware = [
-  cors(corsOptions),
   handleCOrsError,
+  cors(corsOptions),
   express.json(),
   express.urlencoded({ extended: true }),
 ];
