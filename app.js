@@ -21,10 +21,7 @@ const corsOptions = {
   origin: ["http://localhost:3000", "https://growmore.today"],
   optionsSuccessStatus: 200,
 };
-const x = (req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  next();
-};
+
 
 app.use((req, res, next) => {
   res.header({ "Access-Control-Allow-Origin": "*" });
@@ -36,15 +33,13 @@ app.use(
     origin: "*",
   })
 );
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
 const middleware = [
-  // x,
-  // cors(corsOptions),
-  // express.json(),
-  // express.urlencoded({ extended: true }),
+  cors(corsOptions),
+  express.json(),
+  express.urlencoded({ extended: true }),
 ];
-// app.use(middleware);
+app.use(middleware);
 connectDB();
 
 // Run Function
