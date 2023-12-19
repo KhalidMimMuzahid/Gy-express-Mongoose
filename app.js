@@ -14,21 +14,14 @@ const { notFound, errorHandler } = require("./src/middleware/errorMiddleware");
 const runPackageROI = require("./src/utils/runPackageROI");
 const runColorPrediction = require("./src/utils/runColorPrediction");
 
-// Access-Control-Allow-Origin
 
 const corsOptions = {
   origin: ["http://localhost:3000", "https://growmore.today"],
   optionsSuccessStatus: 200,
 };
 
-const handleCOrsError = async (req, res, next) => {
-  res.header({ "Access-Control-Allow-Origin": "*" });
-  // res.header({ "Access-Control-Allow-Origin": "https://growmore.today" });
-  next();
-};
 // Middleware
 const middleware = [
-  handleCOrsError,
   cors(corsOptions),
   express.json(),
   express.urlencoded({ extended: true }),
