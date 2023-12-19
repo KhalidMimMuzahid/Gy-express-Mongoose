@@ -9,7 +9,8 @@ const colourPredictionWinnerSchema = new mongoose.Schema(
     result: String, // this result is for storing options
     period: String,
     date: String,
-    amount: Number,
+    bettingAmount: Number,
+    winningAmount: Number,
   },
   { timestamps: true }
 );

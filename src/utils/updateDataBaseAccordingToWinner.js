@@ -1,6 +1,7 @@
 const generateUniqueIdByDate = require("../config/generateUniqueIdByDate");
 const getIstTime = require("../config/getTime");
 const ColorPrediction = require("../models/colourPrediction ");
+const ColorPredictionAll = require("../models/colourPredictionAll");
 const ColorPredictionWinner = require("../models/colourPredictionWinner");
 const PeriodRecord = require("../models/periodRecord");
 const selectWin = require("../models/selectWin");
@@ -22,7 +23,20 @@ const updateDataBaseAccordingToWinner = async (option) => {
 
   // console.log("bets", bets);
   for (const bet of bets) {
+    // console.log({ bet });
+    // bet: {
+    //   _id: new ObjectId("6581735c2b2fdf3820a4577c"),
+    //   userId: '638235',
+    //   option: 'x1',
+    //   period: '202312190100',
+    //   date: 'Tue Dec 19 2023',
+    //   totalContractMoney: 10,
+    //   createdAt: 2023-12-19T10:41:32.053Z,
+    //   updatedAt: 2023-12-19T10:41:32.053Z,
+    //   __v: 0
+    // }
     const {
+      _id,
       option: optionSelectedByUser,
       totalContractMoney,
       userId,
@@ -35,16 +49,25 @@ const updateDataBaseAccordingToWinner = async (option) => {
       totalContractMoney
     );
 
-    const winner = await ColorPredictionWinner.create({
-      // fullName: bet?.fullName,
-      // number: bet?.number,
-      userId,
-      result: option,
-      period,
-      amount: payout || 0,
-      date: new Date(getIstTime().date).toDateString(),
-    });
+    // this ColorPredictionWinner is for storing every winner for every period
+    // const winner = await ColorPredictionWinner.create({
+    //   userId,
+    //   result: option,
+    //   period,
+    //   bettingAmount: totalContractMoney,
+    //   winningAmount: payout,
+    //   date: new Date(getIstTime().date).toDateString(),
+    // });
     // console.log(winner);
+    // console.log({ _id });
+    // console.log({ winningAmount: payout });
+    const winningAmount = await ColorPredictionAll.findOneAndUpdate(
+      { colorPrediction_id: _id },
+      { winningAmount: payout },
+      { upsert: true, new: true }
+      // { new: true }
+    );
+    // console.log({ winningAmount });
     const wallects = await Wallet.findOneAndUpdate(
       { userId: bet.userId },
       {

@@ -40,6 +40,7 @@ const createColorPrediction = async (req, res) => {
       console.log({ colorPrediction });
 
       await ColorPredictionAll.create({
+        colorPrediction_id: colorPrediction?._id,
         userId: userId,
         option,
         period: period,
