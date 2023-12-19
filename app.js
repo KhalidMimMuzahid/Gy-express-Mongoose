@@ -15,18 +15,36 @@ const runPackageROI = require("./src/utils/runPackageROI");
 const runColorPrediction = require("./src/utils/runColorPrediction");
 
 
+
+// corsOptions
 const corsOptions = {
   origin: ["http://localhost:3000", "https://growmore.today"],
   optionsSuccessStatus: 200,
 };
+const x = (req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+};
 
-// Middleware
+app.use((req, res, next) => {
+  res.header({ "Access-Control-Allow-Origin": "*" });
+  next();
+});
+// app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 const middleware = [
-  cors(corsOptions),
-  express.json(),
-  express.urlencoded({ extended: true }),
+  // x,
+  // cors(corsOptions),
+  // express.json(),
+  // express.urlencoded({ extended: true }),
 ];
-app.use(middleware);
+// app.use(middleware);
 connectDB();
 
 // Run Function
