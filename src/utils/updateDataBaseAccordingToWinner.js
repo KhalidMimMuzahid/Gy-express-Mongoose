@@ -95,9 +95,9 @@ const updateDataBaseAccordingToWinner = async (option) => {
     });
   } else {
     // we need to create PeriodRecord document ==> first find the current period and create
-    const lastUser = await ProidId.findOne().sort({ updatedAt: -1 });
+    const lastPeriod = await ProidId.findOne().sort({ updatedAt: -1 });
     await PeriodRecord.create({
-      periodId: lastUser?.period,
+      periodId: lastPeriod?.period,
       option: option,
       price: totalAmount,
     });
