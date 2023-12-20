@@ -17,22 +17,16 @@ const runColorPrediction = require("./src/utils/runColorPrediction");
 
 
 // corsOptions
-const corsOptions = {
-  origin: ["http://localhost:3000", "https://growmore.today"],
-  optionsSuccessStatus: 200,
-};
 
 
 app.use((req, res, next) => {
   res.header({ "Access-Control-Allow-Origin": "*" });
   next();
 });
-// app.use(cors(corsOptions));
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+const corsOptions = {
+  origin: ["http://localhost:3000", "https://growmore.today"],
+  optionsSuccessStatus: 200,
+};
 
 const middleware = [
   cors(corsOptions),
