@@ -5,6 +5,7 @@ const Wallet = require("../../models/wallet.model");
 const generateRandomString = require("../../config/generateRandomId");
 const getIstTime = require("../../config/getTime");
 
+
 // deposite
 const depositeAmount = async (req, res) => {
   try {
@@ -194,6 +195,8 @@ const getMyWallet = async (req, res) => {
     return res.status(400).json({ message: "Somethig went wrong" });
   }
 };
+
+
 
 module.exports = {
   depositeAmount,

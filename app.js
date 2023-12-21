@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./src/config/db");
-const port = 8787;
+const port = 2023;
 const app = express();
 
 const secureRoutes = require("./src/routes/secure/index");
@@ -14,11 +14,20 @@ const { notFound, errorHandler } = require("./src/middleware/errorMiddleware");
 const runPackageROI = require("./src/utils/runPackageROI");
 const runColorPrediction = require("./src/utils/runColorPrediction");
 
+
+
+// corsOptions
+
+
+app.use((req, res, next) => {
+  res.header({ "Access-Control-Allow-Origin": "*" });
+  next();
+});
 const corsOptions = {
   origin: ["http://localhost:3000", "https://growmore.today"],
   optionsSuccessStatus: 200,
 };
-// Middleware
+
 const middleware = [
   cors(corsOptions),
   express.json(),
