@@ -3,6 +3,7 @@ const Otp = require("../../models/otp.model");
 const bcrypt = require("bcryptjs");
 const PDFData = require("../../models/setting.model");
 const { Result } = require("express-validator");
+const WinningSharePercentage = require("../../models/levelCommissionPerCentageForWinningShare");
 
 const changePassword = async (req, res) => {
   try {
@@ -144,4 +145,43 @@ const changePdfLink = async (req, res) => {
   }
 };
 
-module.exports = { changePassword, updateEmail, changePdfLink };
+// api from client-side    http://localhost:2023/api/v1/private/winning-share-percentage
+const getWinningSharePercentage = async (req, res) => {
+  try {
+    const winningSharePercentage = await WinningSharePercentage.findOne({});
+
+    return res.status(200).json({ data: winningSharePercentage });
+  } catch (error) {
+    return res.status(400).json({ message: "Somethig went wrong" });
+  }
+};
+const updateWinningSharePercentage = async (req, res) => {
+  try {
+    const winningSharePercentageData = req?.body;
+    const winningSharePercentage =
+      await WinningSharePercentage.findOneAndUpdate(
+        {},
+        winningSharePercentageData,
+        { new: true, upsert: true }
+      );
+    // console.log({ winningSharePercentage });
+    // const winningSharePercentage = await WinningSharePercentage.findOne({});
+
+    return res
+      .status(200)
+      .json({
+        data: winningSharePercentage,
+        message: "Data updated successfully",
+      });
+  } catch (error) {
+    return res.status(400).json({ message: "Somethig went wrong" });
+  }
+};
+
+module.exports = {
+  changePassword,
+  updateEmail,
+  changePdfLink,
+  getWinningSharePercentage,
+  updateWinningSharePercentage,
+};

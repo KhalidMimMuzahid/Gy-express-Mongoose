@@ -69,11 +69,14 @@ const updateDataBaseAccordingToWinner = async (option) => {
       // { new: true }
     );
     // console.log({ winningAmount });
+
     const wallects = await Wallet.findOneAndUpdate(
       { userId: bet.userId },
       {
         $inc: {
           winingWallect: +payout,
+          totalIncome: +payout,
+          activeIncome: +payout,
         },
       },
       { new: true }
