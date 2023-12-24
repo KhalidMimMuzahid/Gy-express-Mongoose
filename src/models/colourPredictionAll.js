@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const colorPredictionAllSchema = new mongoose.Schema(
   {
+    colorPrediction_id: mongoose.Types.ObjectId,
     userId: { type: String, require: true },
     option: {
       type: String,
@@ -24,6 +25,7 @@ const colorPredictionAllSchema = new mongoose.Schema(
     period: String,
     date: String,
     totalContractMoney: Number,
+    winningAmount: Number,
   },
   { timestamps: true }
 );
