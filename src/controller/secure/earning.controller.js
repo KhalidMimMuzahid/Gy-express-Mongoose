@@ -1,35 +1,16 @@
 const LevelIncome = require("../../models/levelIncome.model");
 const { RankIncome } = require("../../models/rankIncome.model");
 const { PackageRoi } = require("../../models/topup.model");
+const WiningReferralPercentage = require("../../models/winingReferrlIncomePercentage");
 
 const getLevelIncome = async (req, res) => {
   try {
-    const [levelIncome] = await LevelIncome.aggregate([
-      {
-        $match: {
-          userId: req.auth,
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          totalLevelIncome: {
-            $sum: "$amount",
-          },
-          history: {
-            $push: "$$ROOT",
-          },
-        },
-      },
-      {
-        $sort: {
-          "history.createdAt": -1, // Sort in ascending order, use -1 for descending
-        },
-      },
-    ]);
-    levelIncome.history.sort((a, b) => b.createdAt - a.createdAt);
-    if (levelIncome) {
-      return res.status(200).json({ data: levelIncome });
+    const allLevelsReferralIncome = await WiningReferralPercentage.find({
+      incomeToUserId: req.auth,
+    });
+
+    if (allLevelsReferralIncome) {
+      return res.status(200).json({ data: allLevelsReferralIncome });
     }
   } catch (error) {
     return res.status(400).json({ message: "Something went wrong" });
