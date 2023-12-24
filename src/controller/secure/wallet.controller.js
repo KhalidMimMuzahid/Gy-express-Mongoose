@@ -5,7 +5,6 @@ const Wallet = require("../../models/wallet.model");
 const generateRandomString = require("../../config/generateRandomId");
 const getIstTime = require("../../config/getTime");
 
-
 // deposite
 const depositeAmount = async (req, res) => {
   try {
@@ -38,7 +37,7 @@ const depositeAmount = async (req, res) => {
       avatarPublicUrl: image.public_id,
     };
     if (user) {
-      if (parseInt(amount) >= 25) {
+      if (parseInt(amount) >= 50) {
         // find deposit
         const deposite_exist = await Deposite.findOne({ userId: user.userId });
         if (!deposite_exist) {
@@ -135,7 +134,7 @@ const depositeAmount = async (req, res) => {
         }
       } else {
         return res.status(400).json({
-          message: "Minimum deposite amount is 30",
+          message: "Minimum deposite amount is ₹50",
         });
       }
     } else {
@@ -195,8 +194,6 @@ const getMyWallet = async (req, res) => {
     return res.status(400).json({ message: "Somethig went wrong" });
   }
 };
-
-
 
 module.exports = {
   depositeAmount,

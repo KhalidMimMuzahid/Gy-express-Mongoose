@@ -9,6 +9,20 @@ const ValidationErrorMsg = require("../../helpers/ValidationErrorMsg");
 
 // Withdraw
 const withdrawAmount = async (req, res) => {
+  const error = validationResult(req).formatWith(ValidationErrorMsg);
+  if (!error.isEmpty()) {
+    let msg;
+    Object.keys(req.body).map((d) => {
+      if (error.mapped()[d] !== undefined) {
+        msg = error.mapped()[d];
+      }
+    });
+    if (msg !== undefined) {
+      return res.status(400).json({
+        message: msg,
+      });
+    }
+  }
   try {
     const { amount, accountNumber, withdrawType } = req.body;
     const userId = req.auth;
@@ -19,31 +33,9 @@ const withdrawAmount = async (req, res) => {
       return res.status(400).json({ message: "You are an inactive user" });
     }
 
-    if (Number(amount) >= 500) {
-      // Check for the minimum withdrawal amount
-      // const updateFields = {};
-      // const newData = {
-      //   userId,
-      //   fullName: user.fullName,
-      //   sponsorId: user.sponsorId,
-      //   sponsorName: user.sponsorName,
-      //   requestAmount: Number(amount),
-      //   withdrawCharge: 5,
-      //   amountAfterCharge: Number(amount) - (Number(amount) / 100) * 5,
-      //   currentAmount: withdrawType === "profit" ? wallet.activeIncome - Number(amount) : 0,
-      //   accountNumber,
-      //   status: "pending",
-      //   transactionId: generateRandomString(),
-      //   transactionHash: "",
-      //   withdrawType,
-      //   date: new Date(getIstTime().date).toDateString(),
-      //   time: getIstTime().time,
-      // };
-
+    if (Number(amount) >= 50) {
       if (withdrawType === "investment") {
-        console.log("amount", wallet.investmentAmount);
         if (wallet.investmentAmount >= Number(amount)) {
-          console.log("ali");
           const amountAfterCharge = Number(amount) - (Number(amount) / 100) * 5;
           const newData = {
             userId,
@@ -66,22 +58,31 @@ const withdrawAmount = async (req, res) => {
           const filter = { userId: userId };
           const update = { $inc: { investmentAmount: -Number(amount) } };
           const options = { new: true };
-          const investmentWallet = await Wallet.findOneAndUpdate(
-            filter,
-            update,
-            options
+          await Wallet.findOneAndUpdate(filter, update, options);
+          await PackageRoi.findOneAndUpdate(
+            { userId },
+            {
+              $inc: { currentPackage: -Number(amount) },
+            }
           );
-
-          if (investmentWallet.investmentAmount > 500) {
-            await User.findOneAndUpdate(
-              { userId },
-              { $set: { isActive: false, "packageInfo.amount": 0 } }
-            );
-            await PackageRoi.findOneAndUpdate(
-              { userId },
-              { $set: { isActive: false } }
-            );
-          }
+          await User.findOneAndUpdate(
+            { userId },
+            {
+              $inc: {
+                "packageInfo.amount": -Number(amount),
+              },
+            }
+          );
+          // if (investmentWallet.investmentAmount < 50) {
+          //   await User.findOneAndUpdate(
+          //     { userId },
+          //     { $set: { isActive: false, "packageInfo.amount": 0 } }
+          //   );
+          //   await PackageRoi.findOneAndUpdate(
+          //     { userId },
+          //     { $set: { isActive: false } }
+          //   );
+          // }
           return res
             .status(200)
             .json({ message: "Investment withdrawal successful" });
@@ -112,11 +113,7 @@ const withdrawAmount = async (req, res) => {
           const filter = { userId: userId };
           const update = { $inc: { activeIncome: -Number(amount) } };
           const options = { new: true };
-          const investmentWallet = await Wallet.findOneAndUpdate(
-            filter,
-            update,
-            options
-          );
+          await Wallet.findOneAndUpdate(filter, update, options);
 
           return res
             .status(200)
@@ -127,7 +124,7 @@ const withdrawAmount = async (req, res) => {
       }
     } else {
       return res.status(400).json({
-        message: "Minimum withdrawal amount is ₹500",
+        message: "Minimum withdrawal amount is ₹50",
       });
     }
   } catch (error) {

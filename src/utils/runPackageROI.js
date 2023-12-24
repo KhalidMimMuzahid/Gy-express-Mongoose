@@ -48,7 +48,7 @@ const runPackageROI = () => {
                     4
                   ),
                   totalCommissionAmount: Number(
-                    incomeDayInc * roiPerDayCommissionAmount
+                    ext.totalReturnedAmount + roiPerDayCommissionAmount
                   ).toFixed(4),
                   incomeDay: incomeDayInc,
                   incomeDate: new Date(getIstTime().date).toDateString(),

@@ -9,8 +9,8 @@ const createTopupController = async (req, res) => {
     if (!packageAmount) {
       return res.status(400).json({ message: "Package amount is required" });
     }
-    if (packageAmount < 500) {
-      return res.status(400).json({ message: "Minimum amount is 500 INR" });
+    if (packageAmount < 10) {
+      return res.status(400).json({ message: "Minimum amount is ₹10" });
     }
 
     if (!req.auth) {
@@ -141,8 +141,6 @@ const createTopupController = async (req, res) => {
           $set: {
             isActive: true,
           },
-        },
-        {
           $inc: {
             "packageInfo.amount": +packageAmount,
           },
