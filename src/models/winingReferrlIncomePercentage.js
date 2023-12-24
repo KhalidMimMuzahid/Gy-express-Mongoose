@@ -2,8 +2,17 @@ const mongoose = require("mongoose");
 
 const WinPercentageSchema = new mongoose.Schema(
   {
-    id: { type: String, default: "win-percentage" },
+    incomeToUserId: String,
+    level: Number,
+    incomeFromUserId: String,
+    winningAmount: Number,
     percentage: Number,
+    percentageOfTotalAmount: Number,
+    type: {
+      type: String,
+      enum: ["profit-share", "winning-share"],
+    },
+    date: String,
   },
   { timestamps: true }
 );
