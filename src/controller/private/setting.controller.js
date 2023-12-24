@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const PDFData = require("../../models/setting.model");
 const { Result } = require("express-validator");
 const WinningSharePercentage = require("../../models/levelCommissionPerCentageForWinningShare");
+const { RoiSetting } = require("../../models/roiSetting.model");
 
 const changePassword = async (req, res) => {
   try {
@@ -167,14 +168,47 @@ const updateWinningSharePercentage = async (req, res) => {
     // console.log({ winningSharePercentage });
     // const winningSharePercentage = await WinningSharePercentage.findOne({});
 
-    return res
-      .status(200)
-      .json({
-        data: winningSharePercentage,
-        message: "Data updated successfully",
-      });
+    return res.status(200).json({
+      data: winningSharePercentage,
+      message: "Data updated successfully",
+    });
   } catch (error) {
     return res.status(400).json({ message: "Somethig went wrong" });
+  }
+};
+
+// Update ROI Percentage
+const updateRoiPercentage = async (req, res) => {
+  try {
+    const { roiPercentage } = req.body;
+    if (!roiPercentage) {
+      return res.status(400).json({ message: "ROI Percentage is required" });
+    }
+    const updatedData = await RoiSetting.findOneAndUpdate(
+      {},
+      { roiPercentage: roiPercentage },
+      { new: true, upsert: true }
+    );
+    if (updatedData) {
+      return res.status(200).json({ message: "ROI Percentage is updated" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+// Get ROI percentage
+const getRoiPercentage = async (_req, res) => {
+  try {
+    const roiPercentageData = await RoiSetting.findOne({});
+
+    if (roiPercentageData) {
+      return res.status(200).json({ data: roiPercentageData });
+    } else {
+      return res.status(400).json({ message: "There is no data" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Somethig went wrong" });
   }
 };
 
@@ -184,4 +218,6 @@ module.exports = {
   changePdfLink,
   getWinningSharePercentage,
   updateWinningSharePercentage,
+  updateRoiPercentage,
+  getRoiPercentage,
 };

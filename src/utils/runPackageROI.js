@@ -5,6 +5,7 @@ const { PackageRoi } = require("../models/topup.model");
 const Wallet = require("../models/wallet.model");
 const cron = require("node-cron");
 const levelIncome = require("./levelIncome");
+const { RoiSetting } = require("../models/roiSetting.model");
 
 const runPackageROI = () => {
   cron.schedule(
@@ -12,8 +13,9 @@ const runPackageROI = () => {
     // "*/2 * * * *", // Every 02 mins
     // "*/30 * * * * *", // every 05 secs
     async () => {
+      const roiPercentage = await RoiSetting.findOne({});
       const today = new Date(getIstTime().date).toDateString().split(" ")[0];
-      if (today === "Sat" || today === "Sun") {
+      if (today === "Sat" || today === "Wed") {
         return res.status(400).json({
           message: "ROI isn't distributed on Saturday and Sunday",
         });
@@ -26,11 +28,12 @@ const runPackageROI = () => {
           console.log("userid", ext.userId);
           const incomeDayInc = ext.incomeDay + 1;
           const currentPackageAmount =
-            ((ext.currentPackage + wallet?.activeIncome) / 100) * 0.5;
+            ((ext.currentPackage + wallet?.activeIncome) / 100) *
+            roiPercentage?.roiPercentage;
 
           const roiPerDayCommissionAmount = currentPackageAmount;
           // console.log(roiPerDayCommissionAmount);
-          const roiPerDayCommissionPercentage = 0.5;
+          const roiPerDayCommissionPercentage = roiPercentage?.roiPercentage;
           await PackageRoi.findOneAndUpdate(
             { packageId: ext.packageId },
             {
@@ -48,7 +51,7 @@ const runPackageROI = () => {
                     4
                   ),
                   totalCommissionAmount: Number(
-                    incomeDayInc * roiPerDayCommissionAmount
+                    ext.totalReturnedAmount + roiPerDayCommissionAmount
                   ).toFixed(4),
                   incomeDay: incomeDayInc,
                   incomeDate: new Date(getIstTime().date).toDateString(),
