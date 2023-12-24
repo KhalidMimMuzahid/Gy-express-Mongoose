@@ -2,12 +2,15 @@ const generateUniqueIdByDate = require("../config/generateUniqueIdByDate");
 const getIstTime = require("../config/getTime");
 const ColorPrediction = require("../models/colourPrediction ");
 const ColorPredictionAll = require("../models/colourPredictionAll");
-const ColorPredictionWinner = require("../models/colourPredictionWinner");
+const Level = require("../models/level.model");
+const WinningSharePercentage = require("../models/levelCommissionPerCentageForWinningShare");
 const ProidId = require("../models/periodId.model");
 const PeriodRecord = require("../models/periodRecord");
 const selectWin = require("../models/selectWin");
 const Wallet = require("../models/wallet.model");
+const WiningReferralPercentage = require("../models/winingReferrlIncomePercentage");
 const DeleteAdminHistory = require("./DelectAdminHistory");
+const findObjectFromArrayOfObject = require("./findObjectFromArrayOfObject");
 const getPayOutAmount = require("./getPayOutAmount");
 const getWinnerFilterOptionArray = require("./getWinnerFilterOptionArray");
 
@@ -15,13 +18,17 @@ const updateDataBaseAccordingToWinner = async (option) => {
   const winnerFilterOptionArray = getWinnerFilterOptionArray(option);
   // const bets = await ColorPrediction.find({ option: win?.option });
 
-  console.log({ winnerFilterOptionArray });
+  // console.log({ winnerFilterOptionArray });
   const bets = await ColorPrediction.find({
     option: { $in: winnerFilterOptionArray },
   });
-  console.log({ bets });
+  // console.log({ bets });
   let totalAmount = 0;
 
+  // here we need winningSharePercentage not inside of any loop then it will call db multiple time
+  const winningSharePercentage = await WinningSharePercentage.findOne({});
+
+  // console.log({ winningSharePercentage });
   // console.log("bets", bets);
   for (const bet of bets) {
     // console.log({ bet });
@@ -49,19 +56,6 @@ const updateDataBaseAccordingToWinner = async (option) => {
       option,
       totalContractMoney
     );
-
-    // this ColorPredictionWinner is for storing every winner for every period
-    // const winner = await ColorPredictionWinner.create({
-    //   userId,
-    //   result: option,
-    //   period,
-    //   bettingAmount: totalContractMoney,
-    //   winningAmount: payout,
-    //   date: new Date(getIstTime().date).toDateString(),
-    // });
-    // console.log(winner);
-    // console.log({ _id });
-    // console.log({ winningAmount: payout });
     const winningAmount = await ColorPredictionAll.findOneAndUpdate(
       { colorPrediction_id: _id },
       { winningAmount: payout },
@@ -83,6 +77,63 @@ const updateDataBaseAccordingToWinner = async (option) => {
     );
     totalAmount += payout;
     // console.log({ payout });
+
+    // now its time to share winning wallet to all levels of users
+    const allLevelUsers = await Level.find(
+      { "level.userId": bet.userId },
+      { userId: 1, level: 1 }
+    );
+
+    // const allLevelUsers = await Level.aggregate([
+    //   { $match: { "level.userId": bet.userId } },
+    //   {
+    //     $addFields: { levelObject: { $match: { "level.userId": bet.userId } } },
+    //   },
+    // ]);
+
+    // console.log({ allLevelUsers });
+    if (allLevelUsers.length > 0) {
+      for (const levelUser of allLevelUsers) {
+        const levelObject = findObjectFromArrayOfObject(
+          levelUser?.level,
+          "userId",
+          bet.userId
+        );
+        // levelObject.level
+        // console.log({  });
+
+        // payout  //total winning AMount *
+
+        const percentage =
+          winningSharePercentage[`level${levelObject.level}`] || 1;
+        const winningSharePayout = (payout * percentage) / 100;
+        const winningSharedUser = await Wallet.findOneAndUpdate(
+          { userId: levelUser?.userId },
+          {
+            $inc: {
+              winingShare: +winningSharePayout,
+              totalIncome: +winningSharePayout,
+              activeIncome: +winningSharePayout,
+            },
+          },
+          { new: true }
+        );
+        console.log({ winningSharedUser });
+
+        if (winningSharedUser) {
+          await WiningReferralPercentage.create({
+            level: levelObject?.level,
+            incomeFromUserId: bet?.userId,
+            incomeToUserId: levelUser?.userId,
+            winningAmount: winningSharePayout,
+            percentage: percentage,
+            percentageOfTotalAmount: payout,
+            type: "winning-share",
+            date: new Date(getIstTime().date).toDateString(),
+          });
+        }
+      }
+    }
   }
 
   // console.log("total AMount:", totalAmount);
@@ -105,7 +156,6 @@ const updateDataBaseAccordingToWinner = async (option) => {
       price: totalAmount,
     });
   }
-
   await ColorPrediction.deleteMany({});
   await selectWin.deleteMany({}); // why are deleting all winner history here ?
   await DeleteAdminHistory(); // deleting admin dashboard data when the period has ended
