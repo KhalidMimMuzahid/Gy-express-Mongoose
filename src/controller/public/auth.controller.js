@@ -19,6 +19,7 @@ const generateRandomPassword = require("../../config/generateRandomPassword");
 const { OAuth2Client } = require("google-auth-library");
 const ProidId = require("../../models/periodId.model");
 const PeriodRecord = require("../../models/periodRecord");
+const selectWin = require("../../models/selectWin");
 const secretToken =
   "350224658302-etk8h8jcju1qbrjri8nrkd0uamgs7a62.apps.googleusercontent.com";
 const clientSecret = "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";
@@ -800,7 +801,14 @@ const getPeriodId = async (req, res) => {
   try {
     const periodId = await ProidId.findOne().sort({ updatedAt: -1 });
     if (periodId) {
-      return res.status(200).json({ data: periodId });
+      const selectedWinner = await selectWin.findOne({});
+
+      // console.log({ periodId });
+
+      return res.status(200).json({
+        data: periodId,
+        isWinnerSelected: selectedWinner?.option || false,
+      });
     } else {
       return res.status(400).json({ message: "Data Not Found!" });
     }
