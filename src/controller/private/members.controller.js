@@ -229,14 +229,8 @@ const getTeamStatistics = async (req, res) => {
       totalTeam: teamMembers.length,
       totalActiveTeam,
       teamStats: levelInfo,
-      activeIncome: walletInfo.activeIncome,
-      totalIncome: walletInfo.totalIncome,
-      roiIncome: walletInfo.roiIncome,
-      levelIncome: walletInfo.levelIncome,
-      rankIncome: walletInfo.rankIncome,
       totalWithdraw: withdrawalInfo[0]?.totalWithdraw || 0,
-      investmentAmount: walletInfo.investmentAmount,
-      totalBalance: walletInfo.investmentAmount + walletInfo.activeIncome,
+      ...walletInfo,
     };
 
     if (info) {
