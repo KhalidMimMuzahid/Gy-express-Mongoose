@@ -124,7 +124,7 @@ const registerController = async (req, res) => {
           });
 
           let currentSponsor = user;
-          for (let i = 1; i <= 20; i++) {
+          for (let i = 1; i <= 7; i++) {
             const levelUser = await Level.findOne({
               userId: currentSponsor.sponsorId,
             });

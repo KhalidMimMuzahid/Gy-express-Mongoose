@@ -8,11 +8,10 @@ function findLowestValueObject(array, fieldName) {
 
   // Filter objects that have the minimum value
   const minObjects = array.filter((obj) => obj[fieldName] === minValue);
-  console.log({ minObjects });
+  // console.log({ minObjects });
   // If there are multiple objects with the same lowest value, return a random one
   const randomIndex = Math.floor(Math.random() * minObjects.length);
 
-  console.log({ randomIndex });
   return minObjects[randomIndex];
 }
 module.exports = findLowestValueObject;
