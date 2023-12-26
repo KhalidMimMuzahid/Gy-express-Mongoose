@@ -29,11 +29,11 @@ const generateUniqueIdByDate = async () => {
     const lastUserID = lastUser?.period;
     const check = lastUserID?.substring(lastUserID?.length - 4);
     const lastUsedNumber = Number(check);
-    console.log({ lastUsedNumber });
+    // console.log({ lastUsedNumber });
     const newUserID = `${todayStr}${(lastUsedNumber + 1)
       ?.toString()
       .padStart(4, "0")}`;
-    console.log({ newUserID });
+    // console.log({ newUserID });
 
     await ProidId.create({
       period: newUserID,

@@ -1,20 +1,9 @@
-const getIstTime = require("../config/getTime");
 const cron = require("node-cron");
-
-const Wallet = require("../models/wallet.model");
 const selectWin = require("../models/selectWin");
-const backAmount = require("./backAmount");
-const ColorPrediction = require("../models/colourPrediction ");
-const ColorPredictionWinner = require("../models/colourPredictionWinner");
 const ColorPredictionHistory = require("../models/colourPredictionHistory");
-const generateUniqueIdByDate = require("../config/generateUniqueIdByDate");
-const PeriodRecord = require("../models/periodRecord");
-const DeleteAdminHistory = require("./DelectAdminHistory");
-const getWinnerFilterOptionArray = require("./getWinnerFilterOptionArray");
-const getPayOutAmount = require("./getPayOutAmount");
 const updateDataBaseAccordingToWinner = require("./updateDataBaseAccordingToWinner");
-const findMaxValueObject = require("./findMaxValueObject");
 const findLowestValueObject = require("./findLowestValueObject");
+const ProidId = require("../models/periodId.model");
 
 const runColorPrediction = () => {
   cron.schedule(
@@ -25,7 +14,7 @@ const runColorPrediction = () => {
     async (res, req) => {
       try {
         const win = await selectWin.findOne({ id: "colorPredectionId" });
-        console.log({ win });
+        // console.log({ win });
 
         if (win?.option) {
           try {
@@ -67,9 +56,19 @@ const runColorPrediction = () => {
     },
     { scheduled: true, timezone: "Asia/Kolkata" }
   );
+
+  cron.schedule(
+    "00 00 00 * * *", // This function will run Every Night 12 AM IST
+    async (res, req) => {
+      try {
+        // delete all periodIds here
+        await ProidId.deleteMany({});
+      } catch (error) {
+        // console.log({ error });
+      }
+    },
+    { scheduled: true, timezone: "Asia/Kolkata" }
+  );
 };
 
 module.exports = runColorPrediction;
-
-
-
