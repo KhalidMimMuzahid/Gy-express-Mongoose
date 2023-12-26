@@ -33,22 +33,26 @@ const SelectWinner = async (req, res) => {
     const select = await selectWin.findOne({ id: "colorPredectionId" });
     // console.log(select);
     if (select?.id === "colorPredectionId") {
-      await selectWin.findOneAndUpdate(
-        { id: "colorPredectionId" },
-        {
-          $set: {
-            option: data?.option,
-          },
+    await selectWin.findOneAndUpdate(
+      { id: "colorPredectionId" },
+      {
+        $set: {
+          option: data?.option,
         },
-        { new: true }
-      );
-      return res.status(200).json({ message: "Winner Selected updated" });
+      },
+      { new: true }
+    );
+    return res
+      .status(200)
+      .json({ message: "Winner Selected updated", option: data?.option });
     } else {
       await selectWin.create({
         id: "colorPredectionId",
         option: data?.option,
       });
-      return res.status(200).json({ message: "Winner Selected createx" });
+      return res
+        .status(200)
+        .json({ message: "Winner Selected createx", option: data?.option });
     }
     // return res.status(200).json({ message: "Winner Selected" });
   } catch (error) {

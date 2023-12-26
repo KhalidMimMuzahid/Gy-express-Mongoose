@@ -16,33 +16,14 @@ const getWinnerFilterOptionArray = require("./getWinnerFilterOptionArray");
 
 const updateDataBaseAccordingToWinner = async (option) => {
   const winnerFilterOptionArray = getWinnerFilterOptionArray(option);
-  // const bets = await ColorPrediction.find({ option: win?.option });
-
-  // console.log({ winnerFilterOptionArray });
   const bets = await ColorPrediction.find({
     option: { $in: winnerFilterOptionArray },
   });
-  // console.log({ bets });
   let totalAmount = 0;
 
   // here we need winningSharePercentage not inside of any loop then it will call db multiple time
   const winningSharePercentage = await WinningSharePercentage.findOne({});
-
-  // console.log({ winningSharePercentage });
-  // console.log("bets", bets);
   for (const bet of bets) {
-    // console.log({ bet });
-    // bet: {
-    //   _id: new ObjectId("6581735c2b2fdf3820a4577c"),
-    //   userId: '638235',
-    //   option: 'x1',
-    //   period: '202312190100',
-    //   date: 'Tue Dec 19 2023',
-    //   totalContractMoney: 10,
-    //   createdAt: 2023-12-19T10:41:32.053Z,
-    //   updatedAt: 2023-12-19T10:41:32.053Z,
-    //   __v: 0
-    // }
     const {
       _id,
       option: optionSelectedByUser,
@@ -62,7 +43,6 @@ const updateDataBaseAccordingToWinner = async (option) => {
       { upsert: true, new: true }
       // { new: true }
     );
-    // console.log({ winningAmount });
 
     const wallects = await Wallet.findOneAndUpdate(
       { userId: bet.userId },
@@ -76,22 +56,11 @@ const updateDataBaseAccordingToWinner = async (option) => {
       { new: true }
     );
     totalAmount += payout;
-    // console.log({ payout });
-
     // now its time to share winning wallet to all levels of users
     const allLevelUsers = await Level.find(
       { "level.userId": bet.userId },
       { userId: 1, level: 1 }
     );
-
-    // const allLevelUsers = await Level.aggregate([
-    //   { $match: { "level.userId": bet.userId } },
-    //   {
-    //     $addFields: { levelObject: { $match: { "level.userId": bet.userId } } },
-    //   },
-    // ]);
-
-    // console.log({ allLevelUsers });
     if (allLevelUsers.length > 0) {
       for (const levelUser of allLevelUsers) {
         const levelObject = findObjectFromArrayOfObject(
@@ -99,11 +68,6 @@ const updateDataBaseAccordingToWinner = async (option) => {
           "userId",
           bet.userId
         );
-        // levelObject.level
-        // console.log({  });
-
-        // payout  //total winning AMount *
-
         const percentage =
           winningSharePercentage[`level${levelObject.level}`] || 1;
         const winningSharePayout = (payout * percentage) / 100;
@@ -118,8 +82,6 @@ const updateDataBaseAccordingToWinner = async (option) => {
           },
           { new: true }
         );
-        console.log({ winningSharedUser });
-
         if (winningSharedUser) {
           await WiningReferralPercentage.create({
             level: levelObject?.level,
@@ -136,8 +98,6 @@ const updateDataBaseAccordingToWinner = async (option) => {
     }
   }
 
-  // console.log("total AMount:", totalAmount);
-  // console.log("my id", bets[0].period);
   const periodId = bets[0]?.period;
   if (periodId) {
     await PeriodRecord.create({
