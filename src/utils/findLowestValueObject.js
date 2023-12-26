@@ -1,14 +1,17 @@
-function findLowestValueObject(array, property) {
-  // Check if the array is not empty
+function findLowestValueObject(array, fieldName) {
   if (array.length === 0) {
-    return null; // Return null for an empty array
+    return null;
   }
 
-  // Use reduce to find the object with the lowest value
-  const lowestObject = array.reduce((lowest, current) => {
-    return current[property] < lowest[property] ? current : lowest;
-  });
+  // Find the minimum value of the specified field
+  const minValue = Math.min(...array.map((obj) => obj[fieldName]));
 
-  return lowestObject;
+  // Filter objects that have the minimum value
+  const minObjects = array.filter((obj) => obj[fieldName] === minValue);
+  // console.log({ minObjects });
+  // If there are multiple objects with the same lowest value, return a random one
+  const randomIndex = Math.floor(Math.random() * minObjects.length);
+
+  return minObjects[randomIndex];
 }
 module.exports = findLowestValueObject;
