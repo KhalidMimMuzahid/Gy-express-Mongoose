@@ -42,6 +42,9 @@ runPackageROI();
 runColorPrediction()
 // Here will be custom routes
 
+// /api/v1/secure/my-winning-amount
+// /api/v1/private/winning-amount
+// Sr. | User ID | Period ID |Amount | Date | TID | time IST
 app.use("/api/v1/public", publicRoutes);
 app.use("/api/v1/common", commonRoutes);
 app.use("/api/v1/private", privateRoutes);
