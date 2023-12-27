@@ -79,8 +79,9 @@ const updateDataBaseAccordingToWinner = async (option) => {
           "userId",
           bet.userId
         );
-        const percentage =
-          winningSharePercentage[`level${levelObject.level}`] || 1;
+        const percentage = levelObject?.level
+          ? winningSharePercentage[`level${levelObject?.level}`] || 1
+          : 1;
         const winningSharePayout = (payout * percentage) / 100;
         const winningSharedUser = await Wallet.findOneAndUpdate(
           { userId: levelUser?.userId },
