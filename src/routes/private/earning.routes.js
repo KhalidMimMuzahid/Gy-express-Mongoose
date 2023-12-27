@@ -10,6 +10,6 @@ const router = express.Router();
 router.get("/get_level_income", getAllLevelIncomeController);
 router.get("/get_roi_income", getRoiIncomeController);
 router.get("/get_rank_income", getRankIncomeController);
-// router.get("/winning-amount", getWinningAmount);
+router.get("/winning-amount", getWinningAmount);
 
 module.exports = router;
