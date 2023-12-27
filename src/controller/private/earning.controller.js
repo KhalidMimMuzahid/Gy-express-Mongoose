@@ -65,8 +65,26 @@ const getRankIncomeController = async (_req, res) => {
   }
 };
 
+
+// Get My winning Amount
+const getWinningAmount = async (req, res) => {
+  try {
+    const myWinningHistory = await ColorPredictionWinner.find({
+      userId: req.auth,
+    });
+    if (myWinningHistory?.length > 0) {
+      return res.status(200).json({ data: myWinningHistory });
+    } else {
+      return res.status(400).json({ message: "There is no Rank history" });
+    }
+  } catch (error) {
+    return res.status(400).json({ message: "Something went wrong" });
+  }
+};
+
 module.exports = {
   getAllLevelIncomeController,
   getRoiIncomeController,
   getRankIncomeController,
+  getWinningAmount,
 };

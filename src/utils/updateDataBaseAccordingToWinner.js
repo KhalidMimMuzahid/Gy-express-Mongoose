@@ -2,6 +2,7 @@ const generateUniqueIdByDate = require("../config/generateUniqueIdByDate");
 const getIstTime = require("../config/getTime");
 const ColorPrediction = require("../models/colourPrediction ");
 const ColorPredictionAll = require("../models/colourPredictionAll");
+const ColorPredictionWinner = require("../models/colourPredictionWinner");
 const Level = require("../models/level.model");
 const WinningSharePercentage = require("../models/levelCommissionPerCentageForWinningShare");
 const ProidId = require("../models/periodId.model");
@@ -20,7 +21,8 @@ const updateDataBaseAccordingToWinner = async (option) => {
     option: { $in: winnerFilterOptionArray },
   });
   let totalAmount = 0;
-
+  const date = new Date(getIstTime().date).toDateString();
+  const time = getIstTime().time;
   // here we need winningSharePercentage not inside of any loop then it will call db multiple time
   const winningSharePercentage = await WinningSharePercentage.findOne({});
   for (const bet of bets) {
@@ -43,6 +45,15 @@ const updateDataBaseAccordingToWinner = async (option) => {
       { upsert: true, new: true }
       // { new: true }
     );
+    const colorPredictionWinner = await ColorPredictionWinner.create({
+      userId: bet?.userId,
+      result: option,
+      period: period,
+      date,
+      time,
+      bettingAmount: totalContractMoney,
+      winningAmount: payout,
+    });
 
     const wallects = await Wallet.findOneAndUpdate(
       { userId: bet.userId },
@@ -91,7 +102,7 @@ const updateDataBaseAccordingToWinner = async (option) => {
             percentage: percentage,
             percentageOfTotalAmount: payout,
             type: "winning-share",
-            date: new Date(getIstTime().date).toDateString(),
+            date,
           });
         }
       }
