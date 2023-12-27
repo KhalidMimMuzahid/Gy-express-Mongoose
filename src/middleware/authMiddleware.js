@@ -68,7 +68,7 @@ const verifyUser = async (req, res, next) => {
     } else {
       return res.status(401).send({
         error: {
-          message: "Not authorized, token failed",
+          message: "Not authorized, token failedxxxxxxxxx",
         },
       });
     }
