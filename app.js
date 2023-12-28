@@ -44,9 +44,9 @@ runColorPrediction()
 
 // /api/v1/secure/my-winning-amount
 // /api/v1/private/winning-amount
-
-
 // /api/v1/private/get-betting-history
+// /api/v1/private/get-betting-history-by-user-id/:userId
+// /get-color-statistics/:periodId
 // Sr. | User ID | Period ID |Amount | Date | TID | time IST
 app.use("/api/v1/public", publicRoutes);
 app.use("/api/v1/common", commonRoutes);
