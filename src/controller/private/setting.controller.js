@@ -5,6 +5,7 @@ const PDFData = require("../../models/setting.model");
 const { Result } = require("express-validator");
 const WinningSharePercentage = require("../../models/levelCommissionPerCentageForWinningShare");
 const { RoiSetting } = require("../../models/roiSetting.model");
+const ManageAmount = require("../../models/manageAmount.model");
 
 const changePassword = async (req, res) => {
   try {
@@ -212,6 +213,134 @@ const getRoiPercentage = async (_req, res) => {
   }
 };
 
+const manageAmount = async (req, res) => {
+  try {
+    const { minimumDepositAmount, minimumWithdrawAmount, withdrawPercentage } =
+      req.body;
+
+    if (minimumDepositAmount) {
+      const manageAmount = await ManageAmount.findOneAndUpdate(
+        { Id: "MANAGEAMOUNTID" },
+        { $set: { minimumDepositAmount: minimumDepositAmount } },
+        { new: true, upsert: true }
+      );
+
+      res.json({
+        message: `Minimum deposit set to ${manageAmount.minimumDepositAmount} Rs.`,
+      });
+    } else if (minimumWithdrawAmount) {
+      const manageAmount = await ManageAmount.findOneAndUpdate(
+        { Id: "MANAGEAMOUNTID" },
+        { $set: { minimumWithdrawAmount: minimumWithdrawAmount } },
+        { new: true, upsert: true }
+      );
+
+      res.json({
+        message: `Minimum Withdraw set to ${manageAmount.minimumWithdrawAmount} Rs.`,
+      });
+    } else if (withdrawPercentage) {
+      const manageAmount = await ManageAmount.findOneAndUpdate(
+        { Id: "MANAGEAMOUNTID" },
+        { $set: { withdrawPercentage: withdrawPercentage } },
+        { new: true, upsert: true }
+      );
+
+      res.json({
+        message: `Minimum Withdraw Percentage set to ${manageAmount.withdrawPercentage} Rs.`,
+      });
+    } else {
+      res.status(400).json({
+        message: "Data is missing",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Somethig went wrong" });
+  }
+};
+
+const setMinimumDepositAmount = async (req, res) => {
+  try {
+    const { minimumDepositeAmount } = req.body;
+    if (minimumDepositeAmount) {
+      const manageAmount = await ManageAmount.findOneAndUpdate(
+        { Id: "MANAGEAMOUNTID" },
+        { $set: { minimumDepositAmount: minimumDepositeAmount } },
+        { new: true, upsert: true }
+      );
+
+      return res.json({
+        message: `Minimum deposit set to ${manageAmount.minimumDepositAmount} Rs.`,
+      });
+    } else {
+      return res
+        .status(400)
+        .json({ error: "Minimum deposit amount is required." });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+const setMinimumWithdrawAmount = async (req, res) => {
+  try {
+    const { minimumWithdrawAmount } = req.body;
+
+    if (!minimumWithdrawAmount) {
+      return res
+        .status(400)
+        .json({ error: "Minimum Withdraw Amount is required." });
+    }
+
+    const manageAmount = await ManageAmount.findOneAndUpdate(
+      { Id: "MANAGEAMOUNTID" },
+      { $set: { minimumWithdrawAmount: minimumWithdrawAmount } },
+      { new: true, upsert: true }
+    );
+
+    res.json({
+      message: `Minimum Withdraw set to ${manageAmount.minimumWithdrawAmount} Rs.`,
+    });
+  } catch (error) {
+    console.error("Error in setMinimumWithdrawAmount controller:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+const setWithdrawPercentage = async (req, res) => {
+  try {
+    const { withdrawPercentage } = req.body;
+
+    if (!withdrawPercentage) {
+      return res.status(400).json({ error: 'Withdraw Percentage is required.' });
+    }
+
+    const manageAmount = await ManageAmount.findOneAndUpdate(
+      { Id: "MANAGEAMOUNTID" },
+      { $set: { withdrawPercentage: withdrawPercentage } },
+      { new: true, upsert: true }
+    );
+
+    res.json({
+      message: `Withdraw Percentage set to ${manageAmount.withdrawPercentage}%.`,
+    });
+  } catch (error) {
+    console.error('Error in setWithdrawPercentage controller:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+const getManageAmount = async (req, res) => {
+  try {
+    const manageAmount = await ManageAmount.find();
+    if (manageAmount) {
+      return res.status(200).json({ message: manageAmount });
+    } else {
+      return res.status(400).json({ message: "Data Not Found" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Somethig went wrong" });
+  }
+};
 module.exports = {
   changePassword,
   updateEmail,
@@ -220,4 +349,9 @@ module.exports = {
   updateWinningSharePercentage,
   updateRoiPercentage,
   getRoiPercentage,
+  setMinimumDepositAmount,
+  setMinimumWithdrawAmount,
+  setWithdrawPercentage,
+  getManageAmount,
+  
 };
