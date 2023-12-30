@@ -582,29 +582,30 @@ const getPdfLink = async (_req, res) => {
 const googleLogin = async (req, res) => {
   try {
     const { tokenId } = req.body;
+    console.log(req.body);
     const ticket = await client.verifyIdToken({
       idToken: tokenId,
       audience: secretToken,
     });
     const { payload } = ticket;
-
-    if (req.body.sponsorId) {
-      const checkSponsorId = await User.findOne({
-        username: req.body.sponsorId,
-      });
-      if (!checkSponsorId) {
-        return r.rest(res, false, "Invalid sponsor id");
-      }
-    }
-    const checkMobile = await User.findOne({
-      mobile: req.body.mobile,
-    });
-    if (checkMobile) {
-      return res.status(403).json("Already exist mobile");
-    }
-    function encryptPassword(plainPassword, saltRounds = 10) {
-      return bcrypt.hashSync(plainPassword, saltRounds);
-    }
+    //  console.log({ticket})
+    // if (req.body.sponsorId) {
+    //   const checkSponsorId = await User.findOne({
+    //     username: req.body.sponsorId,
+    //   });
+    //   if (!checkSponsorId) {
+    //     return r.rest(res, false, "Invalid sponsor id");
+    //   }
+    // }
+    // const checkMobile = await User.findOne({
+    //   mobile: req.body.mobile,
+    // });
+    // if (checkMobile) {
+    //   return res.status(403).json("Already exist mobile");
+    // }
+    // function encryptPassword(plainPassword, saltRounds = 10) {
+    //   return bcrypt.hashSync(plainPassword, saltRounds);
+    // }
     // const jwt_secret =
     //   "eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTYzNzQ4OTY0NywiaWF0IjoxNjM3NDg5NjQ3fQ.oWajNoAvD8mojPMNMMEbDKVoug_H0DPnNUog7e1AV38";
     // const jwt_secret = process.env.SEC_KEY;
@@ -623,7 +624,7 @@ const googleLogin = async (req, res) => {
 
       if (email_verified) {
         const userExists = await User.findOne({ email: email });
-
+        console.log({ userExists });
         if (userExists) {
           // generate token only
           const token = generateToken({
@@ -641,6 +642,7 @@ const googleLogin = async (req, res) => {
           });
         } else {
           // Create account and generate token
+          console.log("hello account created ");
           let username;
           let password;
           let isUsernameUnique = false;
@@ -683,11 +685,10 @@ const googleLogin = async (req, res) => {
           const user = await User.create({
             userId: generatedUserId,
             fullName: username,
-            sponsorId: req.body.sponsorId || "admin",
-            sponsorName: sponsorName.sponsorName || "admin",
+            sponsorId: req?.body?.sponsorId || "admin",
+            sponsorName: sponsorName?.sponsorName || "admin",
             password: password,
             email: email,
-
             avatar: picture,
             token: generateToken(email),
             userStatus: true,
@@ -702,21 +703,26 @@ const googleLogin = async (req, res) => {
               username: user.username,
               id: user._id,
             });
+            // create wallet
+            await Wallet.create({
+              userId: user.userId,
+              fullName: user.fullName,
+              sponsorId: user.sponsorId,
+              sponsorName: user.sponsorName,
+              roiIncome: 0,
+              rewardIncome: 0,
+              rankIncome: 0,
+              levelIncome: 0,
+              directIncome: 0,
+              indirectIncome: 0,
+              depositBalance: 0,
+              totalIncome: 0,
+              joiningBonus: 0,
+              investmentAmount: 0,
+              activeIncome: 0,
+            });
 
-            // await TpTokenWallet.create({
-            //   username: user.username,
-            //   total_amount: parseFloat(0),
-            //   total_dollar: parseFloat(0),
-            //   self_token: parseFloat(0),
-            //   level_token: parseFloat(0),
-            //   reward_token: parseFloat(0),
-            //   freeze_amount: parseFloat(0),
-            //   distribute_amount: parseFloat(0),
-            //   bonus_amount: parseFloat(0),
-            //   roi_amount: parseFloat(0),
-            // });
-
-            sendConfrimRegistrationMail(user, user.userId);
+            // sendConfrimRegistrationMail(user, user.userId);
 
             return res.status(200).json({
               username: user.username,

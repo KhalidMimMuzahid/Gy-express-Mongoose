@@ -5,6 +5,7 @@ const Wallet = require("../../models/wallet.model");
 const getIstTime = require("../../config/getTime");
 const ColorPredictionAll = require("../../models/colourPredictionAll");
 const getUpdatePeriodHistoryArray = require("../../utils/getUpdatePeriodHistoryArray");
+const ColorPredictionWinner = require("../../models/colourPredictionWinner");
 
 const createColorPrediction = async (req, res) => {
   try {
@@ -161,4 +162,44 @@ const getColorPrediction = async (req, res) => {
   }
 };
 
-module.exports = { createColorPrediction, getColorPrediction };
+const getPeriodHistory = async (req, res) => {
+  try {
+    const { periodId } = req.body;
+ console.log({periodId})
+ console.log(req.body)
+    // Fetch data from ColorPredictionAll collection
+    const existPeriod = await ColorPredictionAll.find({
+      period: periodId,
+    }).sort({
+      updatedAt: -1,
+    });
+
+    // Fetch data from ColorPredictionWinner collection
+    const Winner = await ColorPredictionWinner.find({ period: periodId });
+
+    // Combine the data from both collections
+    const combinedData = [...existPeriod, ...Winner];
+
+    // Remove duplicates based on the userId
+    const uniqueData = Array.from(new Map(combinedData.map((item) => [item.userId, item])).values());
+
+    console.log({ uniqueData });
+
+    if (uniqueData.length > 0) {
+      // Do something with the unique data
+      res.status(200).json({ data: uniqueData });
+    } else {
+      res.status(404).json({ message: "No data found for the given periodId" });
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = {
+  createColorPrediction,
+  getColorPrediction,
+  getPeriodHistory,
+};
