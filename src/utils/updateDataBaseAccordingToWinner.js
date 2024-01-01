@@ -59,9 +59,9 @@ const updateDataBaseAccordingToWinner = async (option) => {
       { userId: bet.userId },
       {
         $inc: {
-          winingWallect: +payout,
+          winingAmount: +payout,
           totalIncome: +payout,
-          activeIncome: +payout,
+          withdrawalBallance: +payout,
         },
       },
       { new: true }
@@ -87,9 +87,9 @@ const updateDataBaseAccordingToWinner = async (option) => {
           { userId: levelUser?.userId },
           {
             $inc: {
-              winingShare: +winningSharePayout,
+              winingFromLevel: +winningSharePayout,
               totalIncome: +winningSharePayout,
-              activeIncome: +winningSharePayout,
+              withdrawalBallance: +winningSharePayout,
             },
           },
           { new: true }

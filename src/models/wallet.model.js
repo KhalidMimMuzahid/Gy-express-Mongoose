@@ -5,17 +5,19 @@ const walletSchema = new mongoose.Schema({
   fullName: String,
   sponsorId: String,
   sponsorName: String,
-  investmentAmount: Number,
-  roiIncome: Number,
-  levelIncome: Number,
-  directIncome: Number,
-  indirectIncome: Number,
-  depositBalance: Number,
-  totalIncome: Number,
-  winingWallect: Number,
-  winingShare: Number,
-  activeIncome: Number,
-  joiningBonus: Number,
+
+  selfInvestment: Number, //investmentAmount -->  selfInvestment
+  roiIncome: Number, // Actinic Bonus  --> roiIncome
+  levelROI: Number, //Profit Share ---> levelIncome ---> Level ROI
+  // directIncome: Number,   // we are removing  direct income and main wallet
+  // indirectIncome: Number,
+  depositBalance: Number, //done
+  totalIncome: Number, // done
+  winingAmount: Number, //   winingWallect ---> winingAmount
+  winingFromLevel: Number, // winningShare --->  winingFromLevel
+  withdrawalBallance: Number, // activeIncome ---> withdrawalBallance
+
+  // joiningBonus: Number, // we are removing this field
 });
 
 const Wallet = mongoose.model("Wallet", walletSchema);

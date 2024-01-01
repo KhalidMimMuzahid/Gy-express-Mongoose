@@ -122,7 +122,7 @@ const updateWithdrawStatus = async (req, res) => {
           const extPackage = await PackageRoi.findOne({ userId: userId });
           await Wallet.findOneAndUpdate(
             { userId: userId },
-            { $inc: { investmentAmount: +existingWithdraw?.requestAmount } },
+            { $inc: { selfInvestment: +existingWithdraw?.requestAmount } },
             { new: true }
           );
           await User.findOneAndUpdate(
@@ -143,7 +143,7 @@ const updateWithdrawStatus = async (req, res) => {
         } else if (existingWithdraw?.withdrawType === "profit") {
           await Wallet.findOneAndUpdate(
             { userId: userId },
-            { $inc: { activeIncome: +existingWithdraw?.requestAmount } },
+            { $inc: { withdrawalBallance: +existingWithdraw?.requestAmount } },
             { new: true }
           );
         }

@@ -41,7 +41,7 @@ const createTopupController = async (req, res) => {
           {
             $inc: {
               depositBalance: -packageAmount,
-              investmentAmount: +packageAmount,
+              selfInvestment: +packageAmount,
             },
           }
         )
@@ -50,10 +50,11 @@ const createTopupController = async (req, res) => {
           {
             $set: {
               depositBalance: 0,
-              activeIncome: activeIncome - (packageAmount - depositBalance),
+              withdrawalBallance:
+                activeIncome - (packageAmount - depositBalance),
             },
             $inc: {
-              investmentAmount: +packageAmount,
+              selfInvestment: +packageAmount,
             },
           }
         );
