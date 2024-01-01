@@ -2,6 +2,7 @@ const { check } = require("express-validator");
 const User = require("../models/auth.model");
 const Wallet = require("../models/wallet.model");
 const Bank = require("../models/addBank.model");
+const ManageAmount = require("../models/manageAmount.model");
 
 // withdrawAmount
 const withdrawAmountValidators = [
@@ -9,12 +10,24 @@ const withdrawAmountValidators = [
     .notEmpty()
     .withMessage("Amount is required")
     .custom(async (amount, { req }) => {
+      const manageAmount = await ManageAmount.find({});
+
       const wallet = await Wallet.findOne({ userId: req.auth });
-      if (req.body.withdrawType === "profit" && Number(amount) < 50) {
-        return Promise.reject("Minimum withdraw amount is ₹50");
+      if (
+        req.body.withdrawType === "profit" &&
+        Number(amount) < manageAmount[0]?.minimumWithdrawAmount
+      ) {
+        return Promise.reject(
+          `Minimum withdraw amount is ₹${manageAmount[0]?.minimumWithdrawAmount}`
+        );
       }
-      if (req.body.withdrawType === "investment" && Number(amount) < 50) {
-        return Promise.reject("Minimum withdraw amount is ₹50");
+      if (
+        req.body.withdrawType === "investment" &&
+        Number(amount) < manageAmount[0]?.minimumWithdrawAmount
+      ) {
+        return Promise.reject(
+          `Minimum withdraw amount is ₹${manageAmount[0]?.minimumWithdrawAmount}`
+        );
       }
       if (
         (req.body.withdrawType === "investment" &&
