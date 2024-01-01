@@ -6,6 +6,7 @@ const getIstTime = require("../../config/getTime");
 const ColorPredictionAll = require("../../models/colourPredictionAll");
 const getUpdatePeriodHistoryArray = require("../../utils/getUpdatePeriodHistoryArray");
 const ColorPredictionWinner = require("../../models/colourPredictionWinner");
+const ProidId = require("../../models/periodId.model");
 
 const createColorPrediction = async (req, res) => {
   try {
@@ -20,7 +21,7 @@ const createColorPrediction = async (req, res) => {
       totalContractMoney,
     } = req.body;
 
-    console.log({ bettingData: req.body });
+    // console.log({ bettingData: req.body });
 
     // res.json({ ok: 999 });
 
@@ -29,7 +30,7 @@ const createColorPrediction = async (req, res) => {
     // return;
     const wallet = await Wallet.findOne({ userId });
 
-    console.log({ wallet });
+    // console.log({ wallet });
     if (wallet.depositBalance >= Number(totalContractMoney)) {
       const colorPrediction = await ColorPrediction.create({
         userId: userId,
@@ -38,7 +39,7 @@ const createColorPrediction = async (req, res) => {
         totalContractMoney: totalContractMoney,
         date: new Date(getIstTime().date).toDateString(),
       });
-      console.log({ colorPrediction });
+      // console.log({ colorPrediction });
 
       await ColorPredictionAll.create({
         colorPrediction_id: colorPrediction?._id,
@@ -76,22 +77,22 @@ const createColorPrediction = async (req, res) => {
             };
             // const = { option, amount, priceCL }
 
-            console.log({
-              option: optionSelectedByUser,
-              period,
-              userId,
-            });
+            // console.log({
+            //   option: optionSelectedByUser,
+            //   period,
+            //   userId,
+            // });
             const isAlreadyBet = await ColorPrediction.find({
               option: optionSelectedByUser,
               period,
               userId,
             });
-            console.log({ isAlreadyBet });
-            console.log("updateData(before): ", updateData);
+            // console.log({ isAlreadyBet });
+            // console.log("updateData(before): ", updateData);
             if (isAlreadyBet?.length <= 1) {
               updateData.numberOfUser = 1;
             }
-            console.log("updateData(after): ", updateData);
+            // console.log("updateData(after): ", updateData);
             // Use findOneAndUpdate to update the document based on the 'option'
 
             const { option, amount, priceCL } = eachData;
@@ -105,12 +106,14 @@ const createColorPrediction = async (req, res) => {
             );
 
             // If the document with the specified 'option' does not exist, create a new one
+
             if (!result) {
               await ColorPredictionHistory.create({
                 numberOfUser: 1,
                 option,
                 amount,
                 priceCL,
+                serial: Number(option.slice(1)),
               });
             }
           }
@@ -147,7 +150,13 @@ const createColorPrediction = async (req, res) => {
 const getColorPrediction = async (req, res) => {
   try {
     const userId = req.auth;
-    const allBetting = await ColorPredictionAll.find({ userId }).sort({
+    const lastPeriod = await ProidId.findOne().sort({ updatedAt: -1 });
+    const lastPeriodID = lastPeriod?.period;
+
+    const allBetting = await ColorPredictionAll.find({
+      userId,
+      period: { $ne: lastPeriodID },
+    }).sort({
       updatedAt: -1,
     });
 
@@ -197,9 +206,28 @@ const getPeriodHistory = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+const getMyColorPrediction = async (req, res) => {
+  try {
+    const userId = req.auth;
+    const allBetting = await ColorPrediction.find({
+      userId,
+    }).sort({
+      updatedAt: -1,
+    });
 
+    if (allBetting.length > 0) {
+      return res.status(200).json({ data: allBetting });
+    } else {
+      return res.status(404).json({ message: "No Data Found!" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 module.exports = {
   createColorPrediction,
   getColorPrediction,
   getPeriodHistory,
+  getMyColorPrediction,
 };

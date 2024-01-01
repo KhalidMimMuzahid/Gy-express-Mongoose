@@ -59,9 +59,9 @@ const updateDataBaseAccordingToWinner = async (option) => {
       { userId: bet.userId },
       {
         $inc: {
-          winingWallect: +payout,
+          winingAmount: +payout,
           totalIncome: +payout,
-          activeIncome: +payout,
+          withdrawalBallance: +payout,
         },
       },
       { new: true }
@@ -79,17 +79,29 @@ const updateDataBaseAccordingToWinner = async (option) => {
           "userId",
           bet.userId
         );
-        const percentage = levelObject?.level
-          ? winningSharePercentage[`level${levelObject?.level}`] || 1
-          : 1;
+        // console.log({
+        //   percentage: winningSharePercentage[`level${levelObject?.level}`],
+        // });
+        let percentage;
+        try {
+          percentage = levelObject?.level
+            ? winningSharePercentage[`level${levelObject?.level}`]
+              ? winningSharePercentage[`level${levelObject?.level}`]
+              : 1
+            : 1;
+        } catch (error) {
+          console.log({ error });
+          percentage = 1;
+        }
+
         const winningSharePayout = (payout * percentage) / 100;
         const winningSharedUser = await Wallet.findOneAndUpdate(
           { userId: levelUser?.userId },
           {
             $inc: {
-              winingShare: +winningSharePayout,
+              winingFromLevel: +winningSharePayout,
               totalIncome: +winningSharePayout,
-              activeIncome: +winningSharePayout,
+              withdrawalBallance: +winningSharePayout,
             },
           },
           { new: true }

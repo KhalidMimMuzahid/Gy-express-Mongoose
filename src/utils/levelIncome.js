@@ -23,13 +23,9 @@ const levelIncome = async (ext, roiPerDayCommissionAmount) => {
           { userId: lvlUser?.userId },
           {
             $inc: {
-              levelIncome: +commissionAmount,
+              levelROI: +commissionAmount,
               totalIncome: +commissionAmount,
-              activeIncome: +commissionAmount,
-              directIncome:
-                distributorLvl[0]?.level === "1" ? +commissionAmount : 0,
-              indirectIncome:
-                distributorLvl[0]?.level === "1" ? 0 : +commissionAmount,
+              withdrawalBallance: +commissionAmount,
             },
           }
         );

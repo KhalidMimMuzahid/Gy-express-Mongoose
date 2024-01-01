@@ -69,15 +69,15 @@ const depositeAmount = async (req, res) => {
               const updatedDeposite = await Deposite.findOne({
                 userId: user.userId,
               });
-              const updateWallet = await Wallet.findByIdAndUpdate(
-                { _id: wallet._id },
-                {
-                  $set: {
-                    history: updatedDeposite._id,
-                  },
-                }
-              );
-              await updateWallet.save();
+              // const updateWallet = await Wallet.findByIdAndUpdate(
+              //   { _id: wallet._id },
+              //   {
+              //     $set: {
+              //       history: updatedDeposite._id,
+              //     },
+              //   }
+              // );
+              // await updateWallet.save();
             } else {
               return res.status(400).json({
                 message: "Cannot find wallet",
@@ -116,15 +116,15 @@ const depositeAmount = async (req, res) => {
           // update wallet
           const wallet = await Wallet.findOne({ userId: user.userId });
           if (wallet) {
-            const updateWallet = await Wallet.findByIdAndUpdate(
-              { _id: wallet._id },
-              {
-                $set: {
-                  history: updateDeposite._id,
-                },
-              }
-            );
-            await updateWallet.save();
+            // const updateWallet = await Wallet.findByIdAndUpdate(
+            //   { _id: wallet._id },
+            //   {
+            //     $set: {
+            //       history: updateDeposite._id,
+            //     },
+            //   }
+            // );
+            // await updateWallet.save();
           } else {
             return res.status(400).json({
               message: "Cannot find wallet",

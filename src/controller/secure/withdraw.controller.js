@@ -62,7 +62,7 @@ const withdrawAmount = async (req, res) => {
           };
           await Withdraw.create(newData);
           const filter = { userId: userId };
-          const update = { $inc: { investmentAmount: -Number(amount) } };
+          const update = { $inc: { selfInvestment: -Number(amount) } };
           const options = { new: true };
           await Wallet.findOneAndUpdate(filter, update, options);
           await PackageRoi.findOneAndUpdate(
@@ -121,7 +121,7 @@ const withdrawAmount = async (req, res) => {
           };
           await Withdraw.create(newData);
           const filter = { userId: userId };
-          const update = { $inc: { activeIncome: -Number(amount) } };
+          const update = { $inc: { withdrawalBallance: -Number(amount) } };
           const options = { new: true };
           await Wallet.findOneAndUpdate(filter, update, options);
 

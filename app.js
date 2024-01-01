@@ -13,11 +13,9 @@ const privateRoutes = require("./src/routes/private/index");
 const { notFound, errorHandler } = require("./src/middleware/errorMiddleware");
 const runPackageROI = require("./src/utils/runPackageROI");
 const runColorPrediction = require("./src/utils/runColorPrediction");
-
-
+const Wallet = require("./src/models/wallet.model");
 
 // corsOptions
-
 
 app.use((req, res, next) => {
   res.header({ "Access-Control-Allow-Origin": "*" });
@@ -39,7 +37,7 @@ connectDB();
 // Run Function
 runPackageROI();
 //Run Color Prediction
-runColorPrediction()
+runColorPrediction();
 // Here will be custom routes
 
 // /api/v1/secure/my-winning-amount
@@ -54,7 +52,20 @@ app.use("/api/v1/private", privateRoutes);
 app.use("/api/v1/secure", secureRoutes);
 // app.get("/api/v1/test", rankIncome)
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
+  // const result = await Wallet.updateMany(
+  //   {},
+  //   {
+  //     $rename: {
+  //       investmentAmount: "selfInvestment",
+  //       levelIncome: "levelROI",
+  //       winingWallect: "winingAmount",
+  //       winningShare: "winingFromLevel",
+  //       activeIncome: "withdrawalBallance",
+  //     },
+  //   }
+  // );
+
   return res.send("Grow More Today Production !");
 });
 
