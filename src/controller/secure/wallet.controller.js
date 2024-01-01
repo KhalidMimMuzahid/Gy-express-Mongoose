@@ -4,12 +4,13 @@ const Deposite = require("../../models/deposit.model");
 const Wallet = require("../../models/wallet.model");
 const generateRandomString = require("../../config/generateRandomId");
 const getIstTime = require("../../config/getTime");
-
+const ManageAmount = require("../../models/manageAmount.model");
 
 // deposite
 const depositeAmount = async (req, res) => {
   try {
     const { user_id, amount, hash } = req.body;
+    const manageAmount = await ManageAmount.find({});
     console.log("paht", req.file?.path);
     console.log(user_id, amount, hash);
     if (!req.body)
@@ -28,7 +29,7 @@ const depositeAmount = async (req, res) => {
       return res.status(400).json({
         message: "Amount is missing",
       });
-
+ 
     // find user
     const user = await User.findOne({ userId: user_id });
 
@@ -38,7 +39,7 @@ const depositeAmount = async (req, res) => {
       avatarPublicUrl: image.public_id,
     };
     if (user) {
-      if (parseInt(amount) >= 25) {
+      if (parseInt(amount) >=  manageAmount[0]?.minimumDepositAmount) {
         // find deposit
         const deposite_exist = await Deposite.findOne({ userId: user.userId });
         if (!deposite_exist) {
@@ -135,7 +136,7 @@ const depositeAmount = async (req, res) => {
         }
       } else {
         return res.status(400).json({
-          message: "Minimum deposite amount is 30",
+          message: `Minimum deposite amount is  ₹${ manageAmount[0]?.minimumDepositAmount}`,
         });
       }
     } else {
@@ -195,8 +196,6 @@ const getMyWallet = async (req, res) => {
     return res.status(400).json({ message: "Somethig went wrong" });
   }
 };
-
-
 
 module.exports = {
   depositeAmount,
