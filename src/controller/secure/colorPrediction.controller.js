@@ -6,6 +6,7 @@ const getIstTime = require("../../config/getTime");
 const ColorPredictionAll = require("../../models/colourPredictionAll");
 const getUpdatePeriodHistoryArray = require("../../utils/getUpdatePeriodHistoryArray");
 const ColorPredictionWinner = require("../../models/colourPredictionWinner");
+const ProidId = require("../../models/periodId.model");
 
 const createColorPrediction = async (req, res) => {
   try {
@@ -147,7 +148,13 @@ const createColorPrediction = async (req, res) => {
 const getColorPrediction = async (req, res) => {
   try {
     const userId = req.auth;
-    const allBetting = await ColorPredictionAll.find({ userId }).sort({
+    const lastPeriod = await ProidId.findOne().sort({ updatedAt: -1 });
+    const lastPeriodID = lastPeriod?.period;
+
+    const allBetting = await ColorPredictionAll.find({
+      userId,
+      period: { $ne: lastPeriodID },
+    }).sort({
       updatedAt: -1,
     });
 

@@ -16,10 +16,8 @@ const walletSchema = new mongoose.Schema({
   winingAmount: Number, //   winingWallect ---> winingAmount
   winingFromLevel: Number, // winningShare --->  winingFromLevel
   withdrawalBallance: Number, // activeIncome ---> withdrawalBallance
-
   // joiningBonus: Number, // we are removing this field
 });
-
 const Wallet = mongoose.model("Wallet", walletSchema);
 
 module.exports = Wallet;
