@@ -6,6 +6,7 @@ const { PackageRoi } = require("../../models/topup.model");
 const Wallet = require("../../models/wallet.model");
 const Withdraw = require("../../models/withdraw.model");
 const ValidationErrorMsg = require("../../helpers/ValidationErrorMsg");
+const ManageAmount = require("../../models/manageAmount.model");
 
 // Withdraw
 const withdrawAmount = async (req, res) => {
@@ -28,23 +29,28 @@ const withdrawAmount = async (req, res) => {
     const userId = req.auth;
     const user = await User.findOne({ userId });
     const wallet = await Wallet.findOne({ userId });
+    const manageAmount = await ManageAmount.find({});
 
     if (!user?.isActive) {
       return res.status(400).json({ message: "You are an inactive user" });
     }
 
-    if (Number(amount) >= 50) {
+    if (Number(amount) >= manageAmount[0]?.minimumWithdrawAmount) {
       if (withdrawType === "investment") {
         if (wallet.investmentAmount >= Number(amount)) {
-          const amountAfterCharge = Number(amount) - (Number(amount) / 100) * 5;
+          const amountAfterCharge =
+            Number(amount) -
+            (Number(amount) / 100) * manageAmount[0]?.withdrawPercentage;
           const newData = {
             userId,
             fullName: user.fullName,
             sponsorId: user.sponsorId,
             sponsorName: user.sponsorName,
             requestAmount: Number(amount),
-            withdrawCharge: 5,
-            amountAfterCharge: Number(amount) - (Number(amount) / 100) * 5,
+            withdrawCharge: manageAmount[0]?.withdrawPercentage,
+            amountAfterCharge:
+              Number(amount) -
+              (Number(amount) / 100) * manageAmount[0]?.withdrawPercentage,
             chargeAmount: Number(amount) - amountAfterCharge,
             currentAmount: wallet.investmentAmount - Number(amount),
             accountNumber,
@@ -56,7 +62,7 @@ const withdrawAmount = async (req, res) => {
           };
           await Withdraw.create(newData);
           const filter = { userId: userId };
-          const update = { $inc: { investmentAmount: -Number(amount) } };
+          const update = { $inc: { selfInvestment: -Number(amount) } };
           const options = { new: true };
           await Wallet.findOneAndUpdate(filter, update, options);
           await PackageRoi.findOneAndUpdate(
@@ -91,15 +97,19 @@ const withdrawAmount = async (req, res) => {
         }
       } else if (withdrawType === "profit") {
         if (wallet.activeIncome >= Number(amount)) {
-          const amountAfterCharge = Number(amount) - (Number(amount) / 100) * 5;
+          const amountAfterCharge =
+            Number(amount) -
+            (Number(amount) / 100) * manageAmount[0]?.withdrawPercentage;
           const newData = {
             userId,
             fullName: user.fullName,
             sponsorId: user.sponsorId,
             sponsorName: user.sponsorName,
             requestAmount: Number(amount),
-            withdrawCharge: 5,
-            amountAfterCharge: Number(amount) - (Number(amount) / 100) * 5,
+            withdrawCharge: manageAmount[0]?.withdrawPercentage,
+            amountAfterCharge:
+              Number(amount) -
+              (Number(amount) / 100) * manageAmount[0]?.withdrawPercentage,
             chargeAmount: Number(amount) - amountAfterCharge,
             currentAmount: wallet.activeIncome - Number(amount),
             accountNumber,
@@ -111,7 +121,7 @@ const withdrawAmount = async (req, res) => {
           };
           await Withdraw.create(newData);
           const filter = { userId: userId };
-          const update = { $inc: { activeIncome: -Number(amount) } };
+          const update = { $inc: { withdrawalBallance: -Number(amount) } };
           const options = { new: true };
           await Wallet.findOneAndUpdate(filter, update, options);
 
@@ -124,7 +134,7 @@ const withdrawAmount = async (req, res) => {
       }
     } else {
       return res.status(400).json({
-        message: "Minimum withdrawal amount is ₹50",
+        message: `Minimum withdrawal amount is ₹${manageAmount[0]?.minimumWithdrawAmount}`,
       });
     }
   } catch (error) {

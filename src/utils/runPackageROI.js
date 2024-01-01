@@ -75,7 +75,7 @@ const runPackageROI = () => {
                 $inc: {
                   roiIncome: +Number(roiPerDayCommissionAmount),
                   totalIncome: +Number(roiPerDayCommissionAmount),
-                  activeIncome: +Number(roiPerDayCommissionAmount),
+                  withdrawalBallance: +Number(roiPerDayCommissionAmount),
                 },
               }
             );

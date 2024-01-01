@@ -4,11 +4,13 @@ const Deposite = require("../../models/deposit.model");
 const Wallet = require("../../models/wallet.model");
 const generateRandomString = require("../../config/generateRandomId");
 const getIstTime = require("../../config/getTime");
+const ManageAmount = require("../../models/manageAmount.model");
 
 // deposite
 const depositeAmount = async (req, res) => {
   try {
     const { user_id, amount, hash } = req.body;
+    const manageAmount = await ManageAmount.find({});
     console.log("paht", req.file?.path);
     console.log(user_id, amount, hash);
     if (!req.body)
@@ -27,7 +29,7 @@ const depositeAmount = async (req, res) => {
       return res.status(400).json({
         message: "Amount is missing",
       });
-
+ 
     // find user
     const user = await User.findOne({ userId: user_id });
 
@@ -37,7 +39,7 @@ const depositeAmount = async (req, res) => {
       avatarPublicUrl: image.public_id,
     };
     if (user) {
-      if (parseInt(amount) >= 50) {
+      if (parseInt(amount) >=  manageAmount[0]?.minimumDepositAmount) {
         // find deposit
         const deposite_exist = await Deposite.findOne({ userId: user.userId });
         if (!deposite_exist) {
@@ -67,15 +69,15 @@ const depositeAmount = async (req, res) => {
               const updatedDeposite = await Deposite.findOne({
                 userId: user.userId,
               });
-              const updateWallet = await Wallet.findByIdAndUpdate(
-                { _id: wallet._id },
-                {
-                  $set: {
-                    history: updatedDeposite._id,
-                  },
-                }
-              );
-              await updateWallet.save();
+              // const updateWallet = await Wallet.findByIdAndUpdate(
+              //   { _id: wallet._id },
+              //   {
+              //     $set: {
+              //       history: updatedDeposite._id,
+              //     },
+              //   }
+              // );
+              // await updateWallet.save();
             } else {
               return res.status(400).json({
                 message: "Cannot find wallet",
@@ -114,15 +116,15 @@ const depositeAmount = async (req, res) => {
           // update wallet
           const wallet = await Wallet.findOne({ userId: user.userId });
           if (wallet) {
-            const updateWallet = await Wallet.findByIdAndUpdate(
-              { _id: wallet._id },
-              {
-                $set: {
-                  history: updateDeposite._id,
-                },
-              }
-            );
-            await updateWallet.save();
+            // const updateWallet = await Wallet.findByIdAndUpdate(
+            //   { _id: wallet._id },
+            //   {
+            //     $set: {
+            //       history: updateDeposite._id,
+            //     },
+            //   }
+            // );
+            // await updateWallet.save();
           } else {
             return res.status(400).json({
               message: "Cannot find wallet",
@@ -134,7 +136,7 @@ const depositeAmount = async (req, res) => {
         }
       } else {
         return res.status(400).json({
-          message: "Minimum deposite amount is ₹50",
+          message: `Minimum deposite amount is  ₹${ manageAmount[0]?.minimumDepositAmount}`,
         });
       }
     } else {

@@ -101,17 +101,15 @@ const registerController = async (req, res) => {
             fullName: user.fullName,
             sponsorId: user.sponsorId,
             sponsorName: user.sponsorName,
+
             roiIncome: 0,
-            rewardIncome: 0,
-            rankIncome: 0,
-            levelIncome: 0,
-            directIncome: 0,
-            indirectIncome: 0,
+            levelROI: 0,
             depositBalance: 0,
             totalIncome: 0,
-            joiningBonus: 0,
-            investmentAmount: 0,
-            activeIncome: 0,
+            selfInvestment: 0,
+            withdrawalBallance: 0,
+            winingAmount: 0,
+            winingFromLevel: 0,
           });
 
           // create level new for user
@@ -709,17 +707,15 @@ const googleLogin = async (req, res) => {
               fullName: user.fullName,
               sponsorId: user.sponsorId,
               sponsorName: user.sponsorName,
+
               roiIncome: 0,
-              rewardIncome: 0,
-              rankIncome: 0,
-              levelIncome: 0,
-              directIncome: 0,
-              indirectIncome: 0,
+              levelROI: 0,
               depositBalance: 0,
               totalIncome: 0,
-              joiningBonus: 0,
-              investmentAmount: 0,
-              activeIncome: 0,
+              selfInvestment: 0,
+              withdrawalBallance: 0,
+              winingAmount: 0,
+              winingFromLevel: 0,
             });
 
             // sendConfrimRegistrationMail(user, user.userId);

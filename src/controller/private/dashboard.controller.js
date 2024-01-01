@@ -13,7 +13,7 @@ const getAdminDashboardStatsController = async (req, res) => {
         $group: {
           _id: null,
           totalInvestmentAmount: {
-            $sum: "$investmentAmount",
+            $sum: "$selfInvestment",
           },
         },
       },
