@@ -96,7 +96,7 @@ const withdrawAmount = async (req, res) => {
           return res.status(400).json({ message: "Insufficient Balance" });
         }
       } else if (withdrawType === "profit") {
-        if (wallet.activeIncome >= Number(amount)) {
+        if (wallet.withdrawalBallance >= Number(amount)) {
           const amountAfterCharge =
             Number(amount) -
             (Number(amount) / 100) * manageAmount[0]?.withdrawPercentage;
@@ -111,7 +111,7 @@ const withdrawAmount = async (req, res) => {
               Number(amount) -
               (Number(amount) / 100) * manageAmount[0]?.withdrawPercentage,
             chargeAmount: Number(amount) - amountAfterCharge,
-            currentAmount: wallet.activeIncome - Number(amount),
+            currentAmount: wallet?.withdrawalBallance - Number(amount),
             accountNumber,
             status: "pending",
             transactionId: generateRandomString(),

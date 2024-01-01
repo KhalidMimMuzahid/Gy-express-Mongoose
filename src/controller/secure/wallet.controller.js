@@ -189,7 +189,7 @@ const getMyWallet = async (req, res) => {
   try {
     const wallet = await Wallet.findOne({ userId: req.auth }).lean();
     if (wallet) {
-      wallet.totalBalance = wallet.investmentAmount + wallet.activeIncome;
+      // wallet.totalBalance = wallet.investmentAmount + wallet.withdrawalBallance;
       return res.status(200).json({ data: wallet });
     }
   } catch (error) {

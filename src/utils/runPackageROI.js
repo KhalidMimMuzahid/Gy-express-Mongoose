@@ -11,7 +11,7 @@ const runPackageROI = () => {
   cron.schedule(
     "00 00 00 * * *", // This function will run Every Night 12 AM IST
     // "*/2 * * * *", // Every 02 mins
-    // "*/30 * * * * *", // every 05 secs
+    // "*/10 * * * * *", // every 05 secs
     async () => {
       try {
         const roiPercentage = await RoiSetting.findOne({});
@@ -29,12 +29,13 @@ const runPackageROI = () => {
             console.log("userid", ext.userId);
             const incomeDayInc = ext.incomeDay + 1;
             const currentPackageAmount =
-              ((Number(ext.currentPackage) + Number(wallet?.activeIncome)) /
+              ((Number(ext.currentPackage) +
+                Number(wallet?.withdrawalBallance)) /
                 100) *
               Number(roiPercentage?.roiPercentage);
 
             const roiPerDayCommissionAmount = currentPackageAmount;
-            // console.log(roiPerDayCommissionAmount);
+            console.log(roiPerDayCommissionAmount);
             const roiPerDayCommissionPercentage = Number(
               roiPercentage?.roiPercentage
             );
@@ -53,9 +54,7 @@ const runPackageROI = () => {
                     commissionPercentagePerDay: Number(
                       roiPerDayCommissionPercentage
                     ),
-                    commissionAmount: Number(roiPerDayCommissionAmount).toFixed(
-                      4
-                    ),
+                    commissionAmount: Number(roiPerDayCommissionAmount),
                     totalCommissionAmount: Number(
                       Number(ext.totalReturnedAmount) +
                         Number(roiPerDayCommissionAmount)
