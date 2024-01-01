@@ -21,7 +21,7 @@ const createColorPrediction = async (req, res) => {
       totalContractMoney,
     } = req.body;
 
-    console.log({ bettingData: req.body });
+    // console.log({ bettingData: req.body });
 
     // res.json({ ok: 999 });
 
@@ -30,7 +30,7 @@ const createColorPrediction = async (req, res) => {
     // return;
     const wallet = await Wallet.findOne({ userId });
 
-    console.log({ wallet });
+    // console.log({ wallet });
     if (wallet.depositBalance >= Number(totalContractMoney)) {
       const colorPrediction = await ColorPrediction.create({
         userId: userId,
@@ -39,7 +39,7 @@ const createColorPrediction = async (req, res) => {
         totalContractMoney: totalContractMoney,
         date: new Date(getIstTime().date).toDateString(),
       });
-      console.log({ colorPrediction });
+      // console.log({ colorPrediction });
 
       await ColorPredictionAll.create({
         colorPrediction_id: colorPrediction?._id,
@@ -77,22 +77,22 @@ const createColorPrediction = async (req, res) => {
             };
             // const = { option, amount, priceCL }
 
-            console.log({
-              option: optionSelectedByUser,
-              period,
-              userId,
-            });
+            // console.log({
+            //   option: optionSelectedByUser,
+            //   period,
+            //   userId,
+            // });
             const isAlreadyBet = await ColorPrediction.find({
               option: optionSelectedByUser,
               period,
               userId,
             });
-            console.log({ isAlreadyBet });
-            console.log("updateData(before): ", updateData);
+            // console.log({ isAlreadyBet });
+            // console.log("updateData(before): ", updateData);
             if (isAlreadyBet?.length <= 1) {
               updateData.numberOfUser = 1;
             }
-            console.log("updateData(after): ", updateData);
+            // console.log("updateData(after): ", updateData);
             // Use findOneAndUpdate to update the document based on the 'option'
 
             const { option, amount, priceCL } = eachData;
@@ -106,12 +106,14 @@ const createColorPrediction = async (req, res) => {
             );
 
             // If the document with the specified 'option' does not exist, create a new one
+
             if (!result) {
               await ColorPredictionHistory.create({
                 numberOfUser: 1,
                 option,
                 amount,
                 priceCL,
+                serial: Number(option.slice(1)),
               });
             }
           }
