@@ -18,10 +18,10 @@ const createTopupController = async (req, res) => {
     }
 
     // Extracting the balance of user
-    const { depositBalance = 0, activeIncome = 0 } = await Wallet.findOne({
+    const { depositBalance = 0, withdrawalBallance = 0 } = await Wallet.findOne({
       userId: req.auth,
     });
-    if (depositBalance + activeIncome < packageAmount) {
+    if (depositBalance + withdrawalBallance < packageAmount) {
       return res.status(409).json({ message: "Insufficient balance!" });
     }
     const startDate = new Date(
@@ -51,7 +51,7 @@ const createTopupController = async (req, res) => {
             $set: {
               depositBalance: 0,
               withdrawalBallance:
-                activeIncome - (packageAmount - depositBalance),
+              withdrawalBallance - (packageAmount - depositBalance),
             },
             $inc: {
               selfInvestment: +packageAmount,

@@ -33,7 +33,7 @@ const withdrawAmountValidators = [
         (req.body.withdrawType === "investment" &&
           Number(amount) > wallet?.investmentAmount) ||
         (req.body.withdrawType === "profit" &&
-          Number(amount) > wallet?.activeIncome)
+          Number(amount) > wallet?.withdrawalBallance)
       ) {
         return Promise.reject(
           `Insufficient Balance for ${
