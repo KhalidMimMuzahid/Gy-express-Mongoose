@@ -15,4 +15,12 @@ router.get(
   getAllColorPredicionUsHistory.bettingHistory
 );
 
+router.get(
+  "/get-betting-history-by-user-id/:userId",
+  getAllColorPredicionUsHistory.bettingHistoryByUserId
+);
+router.get(
+  "/get-color-statistics/:periodId",
+  getAllColorPredicionUsHistory.getColorStatistics
+);
 module.exports = router;

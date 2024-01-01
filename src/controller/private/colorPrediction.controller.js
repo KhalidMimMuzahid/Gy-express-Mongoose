@@ -1,12 +1,10 @@
 const ColorPredictionHistory = require("../../models/colourPredictionHistory");
-const ColorPredictionWinner = require("../../models/colourPredictionWinner");
-const Wallet = require("../../models/wallet.model");
-const getIstTime = require("../../config/getTime");
 const selectWin = require("../../models/selectWin");
 const WiningReferralPercentage = require("../../models/winingReferrlIncomePercentage");
 
 const getBettingHistoryByPeriodAndOptionSelectedByUser = require("../../utils/getBettingHistryByPeriodAndOptionSelectedByUser");
 const PeriodRecord = require("../../models/periodRecord");
+const ColorPredictionAll = require("../../models/colourPredictionAll");
 
 const AllColorPredictionsHistory = async (req, res) => {
   try {
@@ -193,11 +191,142 @@ const bettingHistory = async (req, res) => {
         x13,
       },
     };
-
-    // console.log( {data} )
-    res.status(500).json(data);
+    res.status(200).json(data);
   } catch (error) {
     console.error(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+const bettingHistoryByUserId = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const allBetting = await ColorPredictionAll.find({ userId });
+
+    const bettingCount = allBetting?.length || 0;
+    const bettingAmount = allBetting?.reduce(function (total, currentBetting) {
+      return total + (currentBetting?.totalContractMoney || 0);
+    }, 0);
+    const winningAmount = allBetting?.reduce(function (total, currentBetting) {
+      return total + (currentBetting?.winningAmount || 0);
+    }, 0);
+
+    const losingAmount = allBetting?.reduce(function (total, currentBetting) {
+      return (
+        total +
+        (currentBetting?.winningAmount > 0
+          ? 0
+          : currentBetting?.totalContractMoney)
+      );
+    }, 0);
+    res.status(200).json({
+      bettingCount,
+      bettingAmount,
+      winningAmount,
+      losingAmount,
+      allBetting,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+const getColorStatistics = async (req, res) => {
+  try {
+    const period = req.params.periodId;
+
+    let statisticCount = {
+      green: 0,
+      red: 0,
+      violet: 0,
+    };
+    const allBetting = await ColorPredictionAll.find(
+      { period },
+      { _id: 0, option: 1 }
+    );
+
+    for (const betting of allBetting) {
+      if (betting?.option === "x1") {
+        statisticCount = {
+          ...statisticCount,
+          green: statisticCount.green + 1,
+        };
+      } else if (betting?.option === "x2") {
+        statisticCount = {
+          ...statisticCount,
+          violet: statisticCount.violet + 1,
+        };
+      } else if (betting?.option === "x3") {
+        statisticCount = {
+          ...statisticCount,
+          red: statisticCount.red + 1,
+        };
+      } else if (betting?.option === "x4") {
+        statisticCount = {
+          ...statisticCount,
+          red: statisticCount.red + 1,
+          violet: statisticCount.violet + 1,
+        };
+      } else if (betting?.option === "x5") {
+        statisticCount = {
+          ...statisticCount,
+          green: statisticCount.green + 1,
+        };
+      } else if (betting?.option === "x6") {
+        statisticCount = {
+          ...statisticCount,
+          red: statisticCount.red + 1,
+        };
+      } else if (betting?.option === "x7") {
+        statisticCount = {
+          ...statisticCount,
+          green: statisticCount.green + 1,
+        };
+      } else if (betting?.option === "x8") {
+        statisticCount = {
+          ...statisticCount,
+          red: statisticCount.red + 1,
+        };
+      } else if (betting?.option === "x9") {
+        statisticCount = {
+          ...statisticCount,
+          green: statisticCount.green + 1,
+          violet: statisticCount.violet + 1,
+        };
+      } else if (betting?.option === "x10") {
+        statisticCount = {
+          ...statisticCount,
+          red: statisticCount.red + 1,
+        };
+      } else if (betting?.option === "x11") {
+        statisticCount = {
+          ...statisticCount,
+          green: statisticCount.green + 1,
+        };
+      } else if (betting?.option === "x12") {
+        statisticCount = {
+          ...statisticCount,
+          red: statisticCount.red + 1,
+        };
+      } else if (betting?.option === "x13") {
+        statisticCount = {
+          ...statisticCount,
+          green: statisticCount.green + 1,
+        };
+      }
+    }
+    const totalCount =
+      (statisticCount?.green || 0) +
+      (statisticCount?.red || 0) +
+      (statisticCount?.violet || 0);
+
+    const colorStatistic = {
+      green: (statisticCount?.green / totalCount) * 100,
+      red: (statisticCount?.red / totalCount) * 100,
+      violet: (statisticCount?.violet / totalCount) * 100,
+    };
+    res.status(200).json({ colorStatistic });
+  } catch (error) {
+    console.log({ error });
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -206,4 +335,6 @@ module.exports = {
   SelectWinner,
   winingRefferralPercentage,
   bettingHistory,
+  bettingHistoryByUserId,
+  getColorStatistics,
 };
