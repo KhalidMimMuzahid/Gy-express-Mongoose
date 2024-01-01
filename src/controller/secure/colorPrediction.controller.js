@@ -206,9 +206,28 @@ const getPeriodHistory = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+const getMyColorPrediction = async (req, res) => {
+  try {
+    const userId = req.auth;
+    const allBetting = await ColorPrediction.find({
+      userId,
+    }).sort({
+      updatedAt: -1,
+    });
 
+    if (allBetting.length > 0) {
+      return res.status(200).json({ data: allBetting });
+    } else {
+      return res.status(404).json({ message: "No Data Found!" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 module.exports = {
   createColorPrediction,
   getColorPrediction,
   getPeriodHistory,
+  getMyColorPrediction,
 };
