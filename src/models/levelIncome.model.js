@@ -8,7 +8,7 @@ const levelIncomeSchema = new mongoose.Schema(
     },
     fullName: {
       type: String,
-      required: true,
+      // required: true,
     },
     incomeFrom: {
       type: String,
@@ -16,12 +16,19 @@ const levelIncomeSchema = new mongoose.Schema(
     },
     incomeFromFullName: {
       type: String,
-      required: true,
+      // required: true,
     },
     level: {
       type: String,
       required: true,
     },
+
+    type: {
+      type: String,
+      enum: ["profit-share", "winning-share"],
+    },
+    percentageOfTotalAmount: Number,
+    percentage: Number,
     amount: {
       type: Number,
       required: true,
@@ -43,7 +50,7 @@ const levelIncomeSchema = new mongoose.Schema(
         date: String,
         time: String,
       },
-      required: true,
+      // required: true,
     },
     selfPackageInfo: {
       type: {
@@ -54,7 +61,7 @@ const levelIncomeSchema = new mongoose.Schema(
         date: String,
         time: String,
       },
-      required: true,
+      // required: true,
     },
     transactionID: {
       type: String,
@@ -68,3 +75,22 @@ const levelIncomeSchema = new mongoose.Schema(
 const LevelIncome = mongoose.model("LevelIncome", levelIncomeSchema);
 
 module.exports = LevelIncome;
+
+
+
+
+
+
+
+// userId,
+// fullName,
+// incomeFrom,
+// incomeFromFullName,
+// level,
+// type,
+// percentageOfTotalAmount,
+// percentage,
+// amount,
+// date,
+// time,
+// transactionID

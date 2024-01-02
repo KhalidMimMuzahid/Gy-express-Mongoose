@@ -1,3 +1,4 @@
+const generateString = require("../config/generateRandomString");
 const generateUniqueIdByDate = require("../config/generateUniqueIdByDate");
 const getIstTime = require("../config/getTime");
 const ColorPrediction = require("../models/colourPrediction ");
@@ -5,6 +6,7 @@ const ColorPredictionAll = require("../models/colourPredictionAll");
 const ColorPredictionWinner = require("../models/colourPredictionWinner");
 const Level = require("../models/level.model");
 const WinningSharePercentage = require("../models/levelCommissionPerCentageForWinningShare");
+const LevelIncome = require("../models/levelIncome.model");
 const ProidId = require("../models/periodId.model");
 const PeriodRecord = require("../models/periodRecord");
 const selectWin = require("../models/selectWin");
@@ -23,6 +25,7 @@ const updateDataBaseAccordingToWinner = async (option) => {
   let totalAmount = 0;
   const date = new Date(getIstTime().date).toDateString();
   const time = getIstTime().time;
+
   // here we need winningSharePercentage not inside of any loop then it will call db multiple time
   const winningSharePercentage = await WinningSharePercentage.findOne({});
   for (const bet of bets) {
@@ -72,6 +75,9 @@ const updateDataBaseAccordingToWinner = async (option) => {
       { "level.userId": bet.userId },
       { userId: 1, level: 1 }
     );
+
+    console.log({ allLevelUsers });
+
     if (allLevelUsers.length > 0) {
       for (const levelUser of allLevelUsers) {
         const levelObject = findObjectFromArrayOfObject(
@@ -107,15 +113,29 @@ const updateDataBaseAccordingToWinner = async (option) => {
           { new: true }
         );
         if (winningSharedUser) {
-          await WiningReferralPercentage.create({
+          // WiningReferralPercentage
+          await LevelIncome.create({
+            // level: levelObject?.level,
+            // incomeFromUserId: bet?.userId,
+            // incomeToUserId: levelUser?.userId,
+            // winningAmount: winningSharePayout,
+            // percentage: percentage,
+            // percentageOfTotalAmount: payout,
+            // type: "winning-share",
+            // date,
+
+            userId: levelUser?.userId,
+            // fullName,
+            incomeFrom: bet?.userId,
+            // incomeFromFullName,
             level: levelObject?.level,
-            incomeFromUserId: bet?.userId,
-            incomeToUserId: levelUser?.userId,
-            winningAmount: winningSharePayout,
-            percentage: percentage,
-            percentageOfTotalAmount: payout,
             type: "winning-share",
+            percentageOfTotalAmount: payout,
+            percentage: percentage,
+            amount: winningSharePayout,
             date,
+            time,
+            transactionID: generateString(15),
           });
         }
       }

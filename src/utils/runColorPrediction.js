@@ -20,7 +20,7 @@ const runColorPrediction = () => {
           try {
             await updateDataBaseAccordingToWinner(win?.option);
           } catch (error) {
-            // console.log(error);
+            console.log({ errorX: error });
             return res.status(400).json({
               message: error.toString(),
             });

@@ -7,7 +7,7 @@ router.get(
   getAllColorPredicionUsHistory.AllColorPredictionsHistory
 );
 router.post("/select-winner", getAllColorPredicionUsHistory.SelectWinner);
-router.post("/set-referral-percentage", getAllColorPredicionUsHistory.winingRefferralPercentage);
+
 
 
 router.get(
