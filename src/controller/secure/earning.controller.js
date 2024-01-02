@@ -65,6 +65,9 @@ const getMyWinningAmount = async (req, res) => {
     const myWinningHistory = await ColorPredictionWinner.find({
       userId: req.auth,
     });
+
+
+    console.log({ myWinningHistory });
     if (myWinningHistory?.length > 0) {
       return res.status(200).json({ data: myWinningHistory });
     } else {

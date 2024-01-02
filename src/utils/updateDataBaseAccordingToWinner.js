@@ -90,7 +90,7 @@ const updateDataBaseAccordingToWinner = async (option) => {
               : 1
             : 1;
         } catch (error) {
-          console.log({ error });
+          // console.log({ error });
           percentage = 1;
         }
 
