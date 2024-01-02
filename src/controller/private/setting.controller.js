@@ -157,6 +157,7 @@ const getWinningSharePercentage = async (req, res) => {
     return res.status(400).json({ message: "Somethig went wrong" });
   }
 };
+//this api  is for updating winning share percentage by admin
 const updateWinningSharePercentage = async (req, res) => {
   try {
     const winningSharePercentageData = req?.body;

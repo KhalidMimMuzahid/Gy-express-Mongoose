@@ -61,39 +61,7 @@ const SelectWinner = async (req, res) => {
   }
 };
 
-const winingRefferralPercentage = async (req, res) => {
-  try {
-    const { amount } = req.body;
-    const winPercentage = await WiningReferralPercentage.findOne({
-      id: "win-percentage",
-    });
 
-    if (winPercentage) {
-      // Update existing percentage
-      await WiningReferralPercentage.findOneAndUpdate(
-        { id: "win-percentage" },
-        {
-          $set: {
-            percentage: amount,
-          },
-        },
-        { new: true }
-      );
-    } else {
-      // Create new percentage if it doesn't exist
-      await WiningReferralPercentage.create({
-        id: "win-percentage",
-        percentage: amount,
-      });
-      return res.status(200).json({ message: "Percentage created" });
-    }
-
-    return res.status(200).json({ message: "Percentage updated" });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Something went wrong" });
-  }
-};
 const bettingHistory = async (req, res) => {
   try {
     const periodId = req.params.periodId;
@@ -333,7 +301,6 @@ const getColorStatistics = async (req, res) => {
 module.exports = {
   AllColorPredictionsHistory,
   SelectWinner,
-  winingRefferralPercentage,
   bettingHistory,
   bettingHistoryByUserId,
   getColorStatistics,

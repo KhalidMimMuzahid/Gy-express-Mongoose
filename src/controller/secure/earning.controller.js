@@ -6,8 +6,9 @@ const WiningReferralPercentage = require("../../models/winingReferrlIncomePercen
 
 const getLevelIncome = async (req, res) => {
   try {
-    const allLevelsReferralIncome = await WiningReferralPercentage.find({
-      incomeToUserId: req.auth,
+    // WiningReferralPercentage
+    const allLevelsReferralIncome = await LevelIncome.find({
+      userId: req.auth,
     });
 
     if (allLevelsReferralIncome) {
