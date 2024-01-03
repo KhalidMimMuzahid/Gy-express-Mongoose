@@ -1,4 +1,5 @@
 const ColorPredictionWinner = require("../../models/colourPredictionWinner");
+const GameWalletIncome = require("../../models/gameWalletIncome");
 const LevelIncome = require("../../models/levelIncome.model");
 const { RankIncome } = require("../../models/rankIncome.model");
 const { PackageRoi } = require("../../models/topup.model");
@@ -11,6 +12,25 @@ const getAllLevelIncomeController = async (_req, res) => {
     } else {
       return res.status(400).json({
         message: "There is no level income",
+      });
+    }
+  } catch (error) {
+    return res.status(400).json({
+      message: "Something went wrong",
+    });
+  }
+};
+
+const getAllGameWalletIncomeController = async (_req, res) => {
+  try {
+    const gameWalletIncomes = await GameWalletIncome.find({}).sort({
+      createdAt: -1,
+    });
+    if (gameWalletIncomes.length > 0) {
+      return res.status(200).json({ data: gameWalletIncomes });
+    } else {
+      return res.status(400).json({
+        message: "There is no game wallet income",
       });
     }
   } catch (error) {
@@ -81,6 +101,7 @@ const getWinningAmount = async (req, res) => {
 };
 module.exports = {
   getAllLevelIncomeController,
+  getAllGameWalletIncomeController,
   getRoiIncomeController,
   getRankIncomeController,
   getWinningAmount,

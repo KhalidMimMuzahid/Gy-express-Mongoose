@@ -1,4 +1,5 @@
 const ColorPredictionWinner = require("../../models/colourPredictionWinner");
+const GameWalletIncome = require("../../models/gameWalletIncome");
 const LevelIncome = require("../../models/levelIncome.model");
 const { RankIncome } = require("../../models/rankIncome.model");
 const { PackageRoi } = require("../../models/topup.model");
@@ -13,6 +14,21 @@ const getLevelIncome = async (req, res) => {
 
     if (allLevelsReferralIncome) {
       return res.status(200).json({ data: allLevelsReferralIncome });
+    }
+  } catch (error) {
+    return res.status(400).json({ message: "Something went wrong" });
+  }
+};
+
+const getGameWalletIncome = async (req, res) => {
+  try {
+    // WiningReferralPercentage
+    const allGameWalletIncome = await GameWalletIncome.find({
+      userId: req.auth,
+    });
+
+    if (allGameWalletIncome) {
+      return res.status(200).json({ data: allGameWalletIncome });
     }
   } catch (error) {
     return res.status(400).json({ message: "Something went wrong" });
@@ -67,7 +83,6 @@ const getMyWinningAmount = async (req, res) => {
       userId: req.auth,
     });
 
-
     console.log({ myWinningHistory });
     if (myWinningHistory?.length > 0) {
       return res.status(200).json({ data: myWinningHistory });
@@ -81,6 +96,7 @@ const getMyWinningAmount = async (req, res) => {
 
 module.exports = {
   getLevelIncome,
+  getGameWalletIncome,
   getRoiIncome,
   getRankIncome,
   getMyWinningAmount,

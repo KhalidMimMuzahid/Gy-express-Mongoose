@@ -185,7 +185,7 @@ const updateGameWalletPercentage = async (req, res) => {
       gameWalletPercentageData,
       { new: true, upsert: true }
     );
-    // console.log({ gameWalletPercentage });
+    console.log({ gameWalletPercentage });
 
     return res.status(200).json({
       data: gameWalletPercentage,

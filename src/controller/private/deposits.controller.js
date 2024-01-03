@@ -1,6 +1,9 @@
 // const sendEmailNotification = require("../../config/mailNotification");
+const generateString = require("../../config/generateRandomString");
+const getIstTime = require("../../config/getTime");
 const User = require("../../models/auth.model");
 const Deposite = require("../../models/deposit.model");
+const GameWalletIncome = require("../../models/gameWalletIncome");
 const GameWalletPercentage = require("../../models/gameWalletPercentage");
 const Level = require("../../models/level.model");
 const Wallet = require("../../models/wallet.model");
@@ -186,11 +189,42 @@ const updateDepositStatus = async (req, res) => {
           }
         );
 
+        // const x = {
+        //   _id: ObjectId("65927aab2b7570269eca5f80"),
+
+        //   userId: "351142",
+        //   fullName: "Mr Admin",
+        //   email: "admin@gmail.com",
+        //   sponsorId: "ADMIN",
+
+        //   level: [
+        //     {
+        //       level: "1",
+        //       userId: "088774",
+        //       fullName: "Khalid One",
+        //       mobile: "+915454546587",
+        //       email: "khalid1@gmail.com",
+        //       sponsorId: "351142",
+        //       joiningDate: "Mon Jan 01 2024",
+        //       _id: ObjectId("65927d342b7570269eca6008"),
+        //     },
+        //   ],
+        //   createdAt: "2024-01-01T08:41:15.233+00:00",
+        //   updatedAt: "2024-01-02T09:42:21.269+00:00",
+        // };
+
         const allLevel_1_Users = await Level.find(
-          { "level.userId": currentUser?.userId, "level.level": "1" },
+          {
+            level: {
+              $elemMatch: {
+                level: "1",
+                userId: currentUser?.userId,
+              },
+            },
+          },
           { userId: 1 }
         );
-
+        //  const  allLevel_1_Users = allLevel_1_UsersData?.filter(each=> )
         if (allLevel_1_Users.length > 0) {
           for (const levelUser of allLevel_1_Users) {
             let percentage;
@@ -216,18 +250,17 @@ const updateDepositStatus = async (req, res) => {
               { new: true }
             );
             if (gameWalletSharedUser) {
-              // await LevelIncome.create({
-              //   userId: levelUser?.userId,
-              //   incomeFrom: bet?.userId,
-              //   level: levelObject?.level,
-              //   type: "winning-share",
-              //   percentageOfTotalAmount: payout,
-              //   percentage: percentage,
-              //   amount: winningSharePayout,
-              //   date,
-              //   time,
-              //   transactionID: generateString(15),
-              // });
+              await GameWalletIncome.create({
+                userId: levelUser?.userId,
+                incomeFrom: currentUser?.userId,
+                level: "1",
+                percentageOfTotalAmount: existingDeposit.amount,
+                percentage,
+                amount: gameWalletPayout,
+                date: new Date(getIstTime().date).toDateString(),
+                time: getIstTime().time,
+                transactionID: generateString(15),
+              });
             }
           }
         }
@@ -277,3 +310,5 @@ module.exports = {
   showRejectedDeposits,
   updateDepositStatus,
 };
+
+

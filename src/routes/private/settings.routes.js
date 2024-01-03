@@ -22,7 +22,7 @@ router.post("/change_pdf_link", changePdfLink);
 router.get("/winning-share-percentage", getWinningSharePercentage);
 router.patch("/winning-share-percentage", updateWinningSharePercentage);
 
-router.get("/game-wallet-percentage", getWinningSharePercentage);
+router.get("/game-wallet-percentage", getGameWalletPercentage);
 router.patch("/game-wallet-percentage", updateGameWalletPercentage);
 
 router.patch("/roi_percentage", updateRoiPercentage);

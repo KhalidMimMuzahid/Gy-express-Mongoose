@@ -39,8 +39,10 @@ runPackageROI();
 //Run Color Prediction
 runColorPrediction();
 
-//  /api/v1/private/winning-share-percentage
-//  /api/v1/private/winning-share-percentage
+
+// /api/v1/private/get_game_wallet_income
+// /api/v1/secure/get_game_wallet_income
+
 
 app.use("/api/v1/public", publicRoutes);
 app.use("/api/v1/common", commonRoutes);
