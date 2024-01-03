@@ -38,15 +38,10 @@ connectDB();
 runPackageROI();
 //Run Color Prediction
 runColorPrediction();
-// Here will be custom routes
 
-// /api/v1/secure/my-winning-amount
-// /api/v1/private/winning-amount
-// /api/v1/private/get-betting-history
-// /api/v1/private/get-betting-history-by-user-id/:userId
-// /get-color-statistics/:periodId
+//  /api/v1/private/winning-share-percentage
+//  /api/v1/private/winning-share-percentage
 
-// Sr. | User ID | Period ID |Amount | Date | TID | time IST
 app.use("/api/v1/public", publicRoutes);
 app.use("/api/v1/common", commonRoutes);
 app.use("/api/v1/private", privateRoutes);
@@ -54,19 +49,6 @@ app.use("/api/v1/secure", secureRoutes);
 // app.get("/api/v1/test", rankIncome)
 
 app.get("/", async (req, res) => {
-  // const result = await Wallet.updateMany(
-  //   {},
-  //   {
-  //     $rename: {
-  //       investmentAmount: "selfInvestment",
-  //       levelIncome: "levelROI",
-  //       winingWallect: "winingAmount",
-  //       winningShare: "winingFromLevel",
-  //       activeIncome: "withdrawalBallance",
-  //     },
-  //   }
-  // );
-
   return res.send("Grow More Today Production !");
 });
 

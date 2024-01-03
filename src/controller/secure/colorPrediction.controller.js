@@ -29,9 +29,11 @@ const createColorPrediction = async (req, res) => {
     // console.log({ userId });
     // return;
     const wallet = await Wallet.findOne({ userId });
+    //
 
-    // console.log({ wallet });
-    if (wallet.depositBalance >= Number(totalContractMoney)) {
+    const totalPlayableBalance =
+      wallet?.depositBalance + wallet?.withdrawalBallance;
+    if (totalPlayableBalance >= Number(totalContractMoney)) {
       const colorPrediction = await ColorPrediction.create({
         userId: userId,
         option,
@@ -50,10 +52,23 @@ const createColorPrediction = async (req, res) => {
         date: new Date(getIstTime().date).toDateString(),
       });
 
+      const depositBalance = wallet?.depositBalance;
+      const withdrawalBallance = wallet?.withdrawalBallance;
       const filter = { userId: userId };
-      const update = {
-        $inc: { depositBalance: -Number(totalContractMoney) },
-      };
+      let update = {};
+      if (depositBalance >= totalContractMoney) {
+        update = {
+          $inc: { depositBalance: -Number(totalContractMoney) },
+        };
+      } else {
+        update = {
+          $inc: {
+            depositBalance: -depositBalance,
+            withdrawalBallance: -(Number(totalContractMoney) - depositBalance),
+          },
+        };
+      }
+
       const options = { new: true };
       await Wallet.findOneAndUpdate(filter, update, options);
 

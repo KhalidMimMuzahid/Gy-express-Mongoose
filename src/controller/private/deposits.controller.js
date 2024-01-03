@@ -1,6 +1,8 @@
 // const sendEmailNotification = require("../../config/mailNotification");
 const User = require("../../models/auth.model");
 const Deposite = require("../../models/deposit.model");
+const GameWalletPercentage = require("../../models/gameWalletPercentage");
+const Level = require("../../models/level.model");
 const Wallet = require("../../models/wallet.model");
 
 // Show all deposits
@@ -183,6 +185,52 @@ const updateDepositStatus = async (req, res) => {
             },
           }
         );
+
+        const allLevel_1_Users = await Level.find(
+          { "level.userId": currentUser?.userId, "level.level": "1" },
+          { userId: 1 }
+        );
+
+        if (allLevel_1_Users.length > 0) {
+          for (const levelUser of allLevel_1_Users) {
+            let percentage;
+            const gameWalletPercentage = await GameWalletPercentage.findOne({});
+
+            try {
+              percentage = gameWalletPercentage?.level1 || 1;
+            } catch (error) {
+              // console.log({ error });
+              percentage = 1;
+            }
+
+            const gameWalletPayout =
+              (existingDeposit.amount * percentage) / 100;
+            const gameWalletSharedUser = await Wallet.findOneAndUpdate(
+              { userId: levelUser?.userId },
+              {
+                $inc: {
+                  // totalIncome: +winningSharePayout,
+                  gameWallet: +gameWalletPayout,
+                },
+              },
+              { new: true }
+            );
+            if (gameWalletSharedUser) {
+              // await LevelIncome.create({
+              //   userId: levelUser?.userId,
+              //   incomeFrom: bet?.userId,
+              //   level: levelObject?.level,
+              //   type: "winning-share",
+              //   percentageOfTotalAmount: payout,
+              //   percentage: percentage,
+              //   amount: winningSharePayout,
+              //   date,
+              //   time,
+              //   transactionID: generateString(15),
+              // });
+            }
+          }
+        }
         // // Send mail notifiction to user email with request status
         // sendEmailNotification(
         //   currentUser?.userId,

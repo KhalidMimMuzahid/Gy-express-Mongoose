@@ -6,6 +6,7 @@ const { Result } = require("express-validator");
 const WinningSharePercentage = require("../../models/levelCommissionPerCentageForWinningShare");
 const { RoiSetting } = require("../../models/roiSetting.model");
 const ManageAmount = require("../../models/manageAmount.model");
+const GameWalletPercentage = require("../../models/gameWalletPercentage");
 
 const changePassword = async (req, res) => {
   try {
@@ -167,9 +168,6 @@ const updateWinningSharePercentage = async (req, res) => {
         winningSharePercentageData,
         { new: true, upsert: true }
       );
-    // console.log({ winningSharePercentage });
-    // const winningSharePercentage = await WinningSharePercentage.findOne({});
-
     return res.status(200).json({
       data: winningSharePercentage,
       message: "Data updated successfully",
@@ -179,6 +177,33 @@ const updateWinningSharePercentage = async (req, res) => {
   }
 };
 
+const updateGameWalletPercentage = async (req, res) => {
+  try {
+    const gameWalletPercentageData = req?.body;
+    const gameWalletPercentage = await GameWalletPercentage.findOneAndUpdate(
+      {},
+      gameWalletPercentageData,
+      { new: true, upsert: true }
+    );
+    // console.log({ gameWalletPercentage });
+
+    return res.status(200).json({
+      data: gameWalletPercentage,
+      message: "Data updated successfully",
+    });
+  } catch (error) {
+    return res.status(400).json({ message: "Something went wrong" });
+  }
+};
+const getGameWalletPercentage = async (req, res) => {
+  try {
+    const gameWalletPercentage = await WinningSharePercentage.findOne({});
+
+    return res.status(200).json({ data: gameWalletPercentage });
+  } catch (error) {
+    return res.status(400).json({ message: "Something went wrong" });
+  }
+};
 // Update ROI Percentage
 const updateRoiPercentage = async (req, res) => {
   try {
@@ -312,7 +337,9 @@ const setWithdrawPercentage = async (req, res) => {
     const { withdrawPercentage } = req.body;
 
     if (!withdrawPercentage) {
-      return res.status(400).json({ error: 'Withdraw Percentage is required.' });
+      return res
+        .status(400)
+        .json({ error: "Withdraw Percentage is required." });
     }
 
     const manageAmount = await ManageAmount.findOneAndUpdate(
@@ -325,8 +352,8 @@ const setWithdrawPercentage = async (req, res) => {
       message: `Withdraw Percentage set to ${manageAmount.withdrawPercentage}%.`,
     });
   } catch (error) {
-    console.error('Error in setWithdrawPercentage controller:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error in setWithdrawPercentage controller:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 const getManageAmount = async (req, res) => {
@@ -348,11 +375,12 @@ module.exports = {
   changePdfLink,
   getWinningSharePercentage,
   updateWinningSharePercentage,
+  getGameWalletPercentage,
+  updateGameWalletPercentage,
   updateRoiPercentage,
   getRoiPercentage,
   setMinimumDepositAmount,
   setMinimumWithdrawAmount,
   setWithdrawPercentage,
   getManageAmount,
-  
 };
