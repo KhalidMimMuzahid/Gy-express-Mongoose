@@ -11,60 +11,60 @@ const userIDGenerator = () => {
       .padStart(2, "0")}${today.getDate().toString().padStart(2, "0")}`;
 
     const userID = `${todayStr}${lastUsedNumber.toString().padStart(4, "0")}`;
-    //   lastUsedNumber++; // Increment the number for the next call
     return userID;
   } catch (error) {
     console.log(error);
   }
 };
+const checkIsNewDate = () => {
+  // // Get the current date and time in Indian Standard Time (IST)
+  const currentDate = new Date().toLocaleString("en-US", {
+    timeZone: "Asia/Kolkata",
+  });
 
+  // Extract the hours and minutes from the current time
+  const [hours, minutes] = currentDate.split(" ")[1].split(":").map(Number);
+
+  // ---------------------------
+
+  // Get the current date and time in Indian Standard Time (IST)
+
+  // --------------------------------
+  console.log({ hours, minutes });
+  // Check if the time is between 00:00am and 00:03am
+  return hours === 0 && minutes >= 0 && minutes <= 3;
+};
 const generateUniqueIdByDate = async () => {
-  // console.log("xxxxxxxxxxxxyyyyyyyyyyyyy");
   const lastUser = await ProidId.findOne().sort({ updatedAt: -1 });
   if (lastUser) {
     const today = new Date();
-    const todayStr = `${today.getFullYear()}${(today.getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}${today.getDate().toString().padStart(2, "0")}`;
-    const lastUserID = lastUser?.period;
-    const check = lastUserID?.substring(lastUserID?.length - 4);
-    const lastUsedNumber = Number(check);
-    // console.log({ lastUsedNumber });
-    const newUserID = `${todayStr}${(lastUsedNumber + 1)
-      ?.toString()
-      .padStart(4, "0")}`;
-    // console.log({ newUserID });
 
+    const isNewDate = checkIsNewDate();
+    let periodId;
+    if (isNewDate) {
+      await ProidId.deleteMany({}); // deleting all periodIds
+      periodId = userIDGenerator(); // generating id from 0001
+    } else {
+      const todayStr = `${today.getFullYear()}${(today.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}${today.getDate().toString().padStart(2, "0")}`;
+      const lastUserID = lastUser?.period;
+      const check = lastUserID?.substring(lastUserID?.length - 4);
+      const lastUsedNumber = Number(check);
+      periodId = `${todayStr}${(lastUsedNumber + 1)
+        ?.toString()
+        .padStart(4, "0")}`;
+    }
     await ProidId.create({
       period: newUserID,
     });
   } else {
-    const periodId = userIDGenerator();
+    const periodId = userIDGenerator(); // generating id from 0001
 
-    // console.log({ periodId });
     await ProidId.create({
       period: periodId,
     });
   }
-  // console.log({ lastUser });
-
-  // const admin = lastUser?.userId?.toLowerCase();
-  // if (!lastUser) {
-  //   const newID = userIDGenerator();
-  //   return newID;
-  // } else if (check == "9999") {
-  //   const newID = userIDGenerator();
-  //   console.log({ newID });
-  //   return newID;
-  // } else {
-  //   const lastUsedNumber = Number(check);
-  //   console.log({ lastUsedNumber });
-  //   const newUserID = `${todayStr}${(lastUsedNumber + 1)
-  //     ?.toString()
-  //     .padStart(4, "0")}`;
-  //   console.log({ newUserID });
-  //   return newUserID;
-  // }
 };
 
 module.exports = generateUniqueIdByDate;
