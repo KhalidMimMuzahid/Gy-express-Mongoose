@@ -75,8 +75,7 @@ const updateDataBaseAccordingToWinner = async (option) => {
       { "level.userId": bet.userId },
       { userId: 1, level: 1 }
     );
-
-    console.log({ allLevelUsers });
+    // console.log({ allLevelUsers });
 
     if (allLevelUsers.length > 0) {
       for (const levelUser of allLevelUsers) {
