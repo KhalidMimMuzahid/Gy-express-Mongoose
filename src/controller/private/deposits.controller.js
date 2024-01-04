@@ -231,36 +231,40 @@ const updateDepositStatus = async (req, res) => {
             const gameWalletPercentage = await GameWalletPercentage.findOne({});
 
             try {
-              percentage = gameWalletPercentage?.level1 || 1;
+              percentage = gameWalletPercentage?.level1 || 0;
             } catch (error) {
               // console.log({ error });
-              percentage = 1;
+              percentage = 0;
             }
 
             const gameWalletPayout =
               (existingDeposit.amount * percentage) / 100;
-            const gameWalletSharedUser = await Wallet.findOneAndUpdate(
-              { userId: levelUser?.userId },
-              {
-                $inc: {
-                  // totalIncome: +winningSharePayout,
-                  gameWallet: +gameWalletPayout,
+
+            if (gameWalletPayout) {
+              const gameWalletSharedUser = await Wallet.findOneAndUpdate(
+                { userId: levelUser?.userId },
+                {
+                  $inc: {
+                    // totalIncome: +winningSharePayout,
+                    gameWallet: +gameWalletPayout,
+                  },
                 },
-              },
-              { new: true }
-            );
-            if (gameWalletSharedUser) {
-              await GameWalletIncome.create({
-                userId: levelUser?.userId,
-                incomeFrom: currentUser?.userId,
-                level: "1",
-                percentageOfTotalAmount: existingDeposit.amount,
-                percentage,
-                amount: gameWalletPayout,
-                date: new Date(getIstTime().date).toDateString(),
-                time: getIstTime().time,
-                transactionID: generateString(15),
-              });
+                { new: true }
+              );
+
+              if (gameWalletSharedUser) {
+                await GameWalletIncome.create({
+                  userId: levelUser?.userId,
+                  incomeFrom: currentUser?.userId,
+                  level: "1",
+                  percentageOfTotalAmount: existingDeposit.amount,
+                  percentage,
+                  amount: gameWalletPayout,
+                  date: new Date(getIstTime().date).toDateString(),
+                  time: getIstTime().time,
+                  transactionID: generateString(15),
+                });
+              }
             }
           }
         }
