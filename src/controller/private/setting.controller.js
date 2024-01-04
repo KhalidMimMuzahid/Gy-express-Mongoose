@@ -197,7 +197,7 @@ const updateGameWalletPercentage = async (req, res) => {
 };
 const getGameWalletPercentage = async (req, res) => {
   try {
-    const gameWalletPercentage = await WinningSharePercentage.findOne({});
+    const gameWalletPercentage = await GameWalletPercentage.findOne({});
 
     return res.status(200).json({ data: gameWalletPercentage });
   } catch (error) {
