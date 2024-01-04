@@ -56,7 +56,7 @@ const generateUniqueIdByDate = async () => {
         .padStart(4, "0")}`;
     }
     await ProidId.create({
-      period: newUserID,
+      period: periodId,
     });
   } else {
     const periodId = userIDGenerator(); // generating id from 0001
