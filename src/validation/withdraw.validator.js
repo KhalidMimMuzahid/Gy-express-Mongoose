@@ -31,7 +31,7 @@ const withdrawAmountValidators = [
       }
       if (
         (req.body.withdrawType === "investment" &&
-          Number(amount) > wallet?.investmentAmount) ||
+          Number(amount) > wallet?.selfInvestment) ||
         (req.body.withdrawType === "profit" &&
           Number(amount) > wallet?.withdrawalBallance)
       ) {

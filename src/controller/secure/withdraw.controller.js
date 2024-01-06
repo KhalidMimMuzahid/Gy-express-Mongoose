@@ -37,7 +37,7 @@ const withdrawAmount = async (req, res) => {
 
     if (Number(amount) >= manageAmount[0]?.minimumWithdrawAmount) {
       if (withdrawType === "investment") {
-        if (wallet.investmentAmount >= Number(amount)) {
+        if (wallet.selfInvestment >= Number(amount)) {
           const amountAfterCharge =
             Number(amount) -
             (Number(amount) / 100) * manageAmount[0]?.withdrawPercentage;
@@ -52,7 +52,7 @@ const withdrawAmount = async (req, res) => {
               Number(amount) -
               (Number(amount) / 100) * manageAmount[0]?.withdrawPercentage,
             chargeAmount: Number(amount) - amountAfterCharge,
-            currentAmount: wallet.investmentAmount - Number(amount),
+            currentAmount: wallet.selfInvestment - Number(amount),
             accountNumber,
             status: "pending",
             transactionId: generateRandomString(),
