@@ -1,5 +1,5 @@
 const { check } = require("express-validator");
-const User = require("../models/auth.model");
+// const User = require("../models/auth.model");
 const Wallet = require("../models/wallet.model");
 const Bank = require("../models/addBank.model");
 const ManageAmount = require("../models/manageAmount.model");
@@ -14,7 +14,7 @@ const withdrawAmountValidators = [
 
       const wallet = await Wallet.findOne({ userId: req.auth });
       if (
-        req.body.withdrawType === "profit" &&
+        req.body.withdrawType === "income" &&
         Number(amount) < manageAmount[0]?.minimumWithdrawAmount
       ) {
         return Promise.reject(
@@ -32,12 +32,12 @@ const withdrawAmountValidators = [
       if (
         (req.body.withdrawType === "investment" &&
           Number(amount) > wallet?.selfInvestment) ||
-        (req.body.withdrawType === "profit" &&
+        (req.body.withdrawType === "income" &&
           Number(amount) > wallet?.withdrawalBallance)
       ) {
         return Promise.reject(
           `Insufficient Balance for ${
-            req.body.withdrawType === "profit" ? "profit" : "investment"
+            req.body.withdrawType === "income" ? "income" : "investment"
           } withdrawal`
         );
       }
@@ -56,7 +56,7 @@ const withdrawAmountValidators = [
   check("withdrawType")
     .notEmpty()
     .withMessage("Withdraw type is required")
-    .isIn(["investment", "profit"])
+    .isIn(["investment", "income"])
     .withMessage("Invalid withdraw type")
     .trim(),
 ];
