@@ -180,7 +180,9 @@ const loginController = async (req, res) => {
   }
   try {
     const { userId, password } = req.body;
-    const user = await User.findOne({ userId: userId?.toUpperCase() });
+    const user = await User.findOne({
+      $or: [{ userId: userId?.toUpperCase() }, { email: userId }],
+    });
 
     if (!user) {
       return res.status(400).json({ message: "User is not found" });
