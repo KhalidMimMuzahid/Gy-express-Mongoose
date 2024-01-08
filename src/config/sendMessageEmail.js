@@ -6,11 +6,11 @@ const sendMessageEmail = (name, user_id, email, message, subject, mobile) => {
     port: 587,
     secure: false,
     auth: {
-      user: "growmoretodaypro@gmail.com",
-      pass: "hulaxgfjuxykytff",
+      user: "keshav@triplewsols.org",
+      pass: "nciozbzpcuxypmqn",
     },
   });
-  
+
   let messageBody = `<div style="width: 640px; height: fit-content; margin-left: 50px; position: relative;">
    
         
@@ -24,7 +24,7 @@ const sendMessageEmail = (name, user_id, email, message, subject, mobile) => {
 
   let mailOption = {
     from: email,
-    to: "growmoretodaypro@gmail.com",
+    to: "keshav@triplewsols.org",
     subject: subject,
     html: messageBody,
   };
