@@ -9,13 +9,15 @@ const sendEmailNotification = (
   message,
   type
 ) => {
+  // user: "growmoretodaypro@gmail.com",
+  // pass: "hulaxgfjuxykytff",
   let transporter = nodemailer.createTransport({
     service: "Gmail",
     port: 587,
     secure: false,
     auth: {
-      user: "growmoretodaypro@gmail.com",
-      pass: "hulaxgfjuxykytff",
+      user: "keshav@triplewsols.org",
+      pass: "nciozbzpcuxypmqn",
     },
   });
 
