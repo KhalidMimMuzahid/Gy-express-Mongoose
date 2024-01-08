@@ -37,7 +37,7 @@ const withdrawAmount = async (req, res) => {
 
     if (Number(amount) >= manageAmount[0]?.minimumWithdrawAmount) {
       if (withdrawType === "investment") {
-        if (wallet.investmentAmount >= Number(amount)) {
+        if (wallet.selfInvestment >= Number(amount)) {
           const amountAfterCharge =
             Number(amount) -
             (Number(amount) / 100) * manageAmount[0]?.withdrawPercentage;
@@ -52,7 +52,7 @@ const withdrawAmount = async (req, res) => {
               Number(amount) -
               (Number(amount) / 100) * manageAmount[0]?.withdrawPercentage,
             chargeAmount: Number(amount) - amountAfterCharge,
-            currentAmount: wallet.investmentAmount - Number(amount),
+            currentAmount: wallet.selfInvestment - Number(amount),
             accountNumber,
             status: "pending",
             transactionId: generateRandomString(),
@@ -95,7 +95,7 @@ const withdrawAmount = async (req, res) => {
         } else {
           return res.status(400).json({ message: "Insufficient Balance" });
         }
-      } else if (withdrawType === "profit") {
+      } else if (withdrawType === "income") {
         if (wallet.withdrawalBallance >= Number(amount)) {
           const amountAfterCharge =
             Number(amount) -
@@ -127,7 +127,7 @@ const withdrawAmount = async (req, res) => {
 
           return res
             .status(200)
-            .json({ message: "Profit withdrawal successful" });
+            .json({ message: "Income withdrawal successful" });
         } else {
           return res.status(400).json({ message: "Insufficient Balance" });
         }

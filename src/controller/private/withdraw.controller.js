@@ -1,4 +1,4 @@
-// const sendEmailNotification = require("../../config/mailNotification");
+const sendEmailNotification = require("../../config/mailNotification");
 const User = require("../../models/auth.model");
 const { PackageRoi } = require("../../models/topup.model");
 const Wallet = require("../../models/wallet.model");
@@ -72,7 +72,7 @@ const getRejectedWithdraws = async (_req, res) => {
 const updateWithdrawStatus = async (req, res) => {
   try {
     const { transaction_id, status, userId } = req.body;
-    const currentUser = await User.findOne({ userId: userId });
+    // const currentUser = await User.findOne({ userId: userId });
     let message = "";
     const existingWithdraw = await Withdraw.findOne({
       status: "pending",
@@ -119,10 +119,18 @@ const updateWithdrawStatus = async (req, res) => {
           }
         );
         if (existingWithdraw?.withdrawType === "investment") {
-          const extPackage = await PackageRoi.findOne({ userId: userId });
+          // const extPackage = await PackageRoi.findOne({ userId: userId });
           await Wallet.findOneAndUpdate(
             { userId: userId },
             { $inc: { selfInvestment: +existingWithdraw?.requestAmount } },
+            { new: true }
+          );
+          const upPckg = await PackageRoi.findOneAndUpdate(
+            { userId: userId },
+            {
+              $set: { isActive: true },
+              $inc: { currentPackage: +existingWithdraw?.requestAmount },
+            },
             { new: true }
           );
           await User.findOneAndUpdate(
@@ -131,7 +139,7 @@ const updateWithdrawStatus = async (req, res) => {
               $set: {
                 isActive: true,
                 packageInfo: {
-                  amount: extPackage?.currentPackage,
+                  amount: upPckg?.currentPackage,
                 },
               },
             }
@@ -140,7 +148,7 @@ const updateWithdrawStatus = async (req, res) => {
             { userId: userId },
             { $set: { isActive: true } }
           );
-        } else if (existingWithdraw?.withdrawType === "profit") {
+        } else if (existingWithdraw?.withdrawType === "income") {
           await Wallet.findOneAndUpdate(
             { userId: userId },
             { $inc: { withdrawalBallance: +existingWithdraw?.requestAmount } },
@@ -148,15 +156,15 @@ const updateWithdrawStatus = async (req, res) => {
           );
         }
         // Send mail notifiction to user email with request status
-        sendEmailNotification(
-          currentUser?.userId,
-          currentUser?.fullName,
-          currentUser?.email,
-          "Withdrawal Request Status Update",
-          existingWithdraw?.requestAmount,
-          `Unfortunately, your withdrawal request for $${existingWithdraw?.requestAmount} amount has been rejected.`,
-          "withdrawal"
-        );
+        // sendEmailNotification(
+        //   currentUser?.userId,
+        //   currentUser?.fullName,
+        //   currentUser?.email,
+        //   "Withdrawal Request Status Update",
+        //   existingWithdraw?.requestAmount,
+        //   `Unfortunately, your withdrawal request for $${existingWithdraw?.requestAmount} amount has been rejected.`,
+        //   "withdrawal"
+        // );
         message = "Withdraw Rejected";
       }
       return res.status(400).json({
