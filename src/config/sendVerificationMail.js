@@ -5,8 +5,8 @@ const sendVerificationMail = async (user) => {
     port: 587,
     secure: false,
     auth: {
-      user: "growmoretodaypro@gmail.com",
-      pass: "hulaxgfjuxykytff",
+      user: "keshav@triplewsols.org",
+      pass: "nciozbzpcuxypmqn",
     },
   });
   const mailOptions = {

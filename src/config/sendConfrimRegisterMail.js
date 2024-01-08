@@ -6,8 +6,8 @@ const sendConfirmRegistrationMail = (user, userId) => {
     port: 587,
     secure: false,
     auth: {
-      user: "growmoretodaypro@gmail.com",
-      pass: "hulaxgfjuxykytff",
+      user: "keshav@triplewsols.org",
+      pass: "nciozbzpcuxypmqn",
     },
   });
 
